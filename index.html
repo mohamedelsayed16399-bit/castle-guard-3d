@@ -559,7 +559,7 @@ function openPop(tw){
   popTarget=tw;buildType=null;
   const t=TW[tw.type],lv=tw.lv,cur=t.lv[lv-1],nxt=lv<4?t.lv[lv]:null;
   const p=$("pop");
-  const up=nxt?'<button class="up" id="pup">⬆ ترقية '+AR(nxt.cost)+'</button>':"";
+  const up=nxt?'<button class="up" id="pup">⬆ ترقية '+AR(nxt.cost)+'<br><small style="font-weight:600">ضرر '+AR(cur.dmg)+' ← '+AR(nxt.dmg)+' • مدى '+AR(cur.range)+' ← '+AR(nxt.range)+'</small></button>':"";
   p.innerHTML='<div class="pi">'+t.ic+" "+t.n+"<br>مستوى "+AR(lv)+(lv==4?" (ماكس)":"")+"<br>ضرر "+AR(cur.dmg)+" • مدى "+AR(cur.range)+"<br>☠ قتل "+AR(tw.kills||0)+(lv==4?"<br>✨ "+({archer:"سهمين في نفس الوقت",cannon:"أقوى مدفع",frost:"نبضة تجميد كل ٧ ثواني",sniper:"٤٠٪ ضربة حرجة ×٢",tesla:"برق أطول",mortar:"أقوى هاون"}[tw.type]):"")+(()=>{const y=synergy(tw);return y.n?"<br>🤝 تحالف +"+AR(Math.round((y.m-1)*100))+"٪":"<br><small>🤝 حطه جنب أبراج مختلفة +٨٪ لكل نوع</small>"})()+"</div>"
     +up
     +'<button id="ptg">🎯 '+TMN[tw.mode]+'</button>'
