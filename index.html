@@ -366,6 +366,7 @@ const EN={
  bat:{hp:28,spd:3.4,gold:5,dmg:1,scale:.42,col:0x7c3aed,fly:true,name:"خفاش"},
  ghostking:{hp:5200,spd:.95,gold:420,dmg:15,scale:1.75,col:0xa78bfa,boss:true,name:"ملك الأشباح"},
  berserker:{hp:380,spd:1.3,gold:28,dmg:3,scale:.95,col:0xef4444,name:"مسعور"},
+ pharaoh:{hp:7800,spd:.9,gold:450,dmg:18,scale:1.7,col:0xd4af37,boss:true,armor:true,name:"الفرعون"},
  mini:{hp:34,spd:3.2,gold:2,dmg:1,scale:.42,col:0xfb923c,name:"صغير"},
  boss:{hp:3400,spd:.95,gold:250,dmg:12,scale:1.55,col:0x111111,boss:true,name:"الزعيم"},
  titan:{hp:6500,spd:.8,gold:500,dmg:20,scale:1.9,col:0x450a0a,boss:true,name:"العملاق"},
@@ -375,6 +376,7 @@ function enemyModel(t){
   const cfg={ghostking:["sk_warrior",{anim:"Walking_B",animSpeed:.8,tint:0xa78bfa,tintMix:.7,emissive:0x6d28d9,ei:.7}],bat:["sk_minion",{anim:"Jump_Idle",tint:0x7c3aed,tintMix:.6}],dragon:["sk_mage",{anim:"Jump_Idle",tint:0xdc2626,tintMix:.65,emissive:0xff2200,ei:.5}],wraith:["sk_rogue",{anim:"Walking_A",animSpeed:1.1,tint:0xa78bfa,tintMix:.7,emissive:0x5b21b6,ei:.6}],splitter:["sk_rogue",{anim:"Walking_A",animSpeed:1.2,tint:0xff9a4d,tintMix:.55}],armored:["sk_warrior",{anim:"Walking_A",animSpeed:.9,tint:0xd9b44a,tintMix:.6,emissive:0x553300,ei:.3}],mini:["sk_minion",{anim:"Running_A",animSpeed:1.5,tint:0xfb923c,tintMix:.5}],grunt:["sk_minion",{anim:"Walking_A",animSpeed:1.3}],runner:["sk_rogue",{anim:"Running_A",animSpeed:1.3}],brute:["sk_warrior",{anim:"Walking_B",animSpeed:.9,tint:0x9a6bff,tintMix:.45}],
     healer:["sk_mage",{anim:"Walking_A",tint:0x6ee7a0,tintMix:.5}],shield:["sk_warrior",{anim:"Walking_A",tint:0x8fa6c4,tintMix:.5}],flyer:["sk_mage",{anim:"Jump_Idle",tint:0x67e8f9,tintMix:.55}],
     berserker:["sk_warrior",{anim:"Walking_A",animSpeed:1.1,tint:0xef4444,tintMix:.55,emissive:0x991b1b,ei:.4}],
+    pharaoh:["sk_warrior",{anim:"Walking_B",animSpeed:.75,tint:0xffd34d,tintMix:.7,emissive:0xb8860b,ei:.5}],
     boss:["sk_warrior",{anim:"Walking_B",animSpeed:.8,tint:0x555555,tintMix:.6,emissive:0xff2200,ei:.35}],titan:["sk_warrior",{anim:"Walking_B",animSpeed:.7,tint:0x7a1212,tintMix:.55,emissive:0xff3300,ei:.5}]}[t];
   const m=inst(cfg[0],Object.assign({h:H},cfg[1]));g.add(m);
   if(t=="wraith"||t=="ghostking")m.traverse(c=>{if(c.isMesh){c.material=c.material.clone();c.material.transparent=true;c.material.opacity=t=="ghostking"?.7:.55;c.castShadow=false}});g.userData.mixer=m.userData.mixer;
@@ -400,7 +402,7 @@ function chkAch(){try{localStorage.setItem("cg3d_stats",JSON.stringify(XST))}cat
 function showAch(){$("achl").innerHTML=ACHS.map(a=>(XAH[a[0]]?"✅ ":"🔒 ")+"<b>"+a[1]+"</b> · "+a[2]).join("<br>");
  $("achs").textContent="قتلى "+XST.kills+" · جولات "+XST.runs+" · انتصارات "+XST.wins+" · أعلى موجة لانهائي "+XST.endw;$("ach").classList.add("on");$("achx").onclick=()=>$("ach").classList.remove("on")}
 let endless=false,hard=localStorage.getItem("cg3d_hard")=="1",combo=0,lastKill=-9,slowmo=0,DMGM=1;
-const EMO={ghostking:"👻",bat:"🦇",dragon:"🐉",wraith:"👻",grunt:"💀",runner:"💨",brute:"👹",berserker:"😡",healer:"💚",shield:"🛡",flyer:"🦇",boss:"👑",titan:"🔥",splitter:"🧬",armored:"⚙",mini:"🐜"};
+const EMO={ghostking:"👻",bat:"🦇",dragon:"🐉",wraith:"👻",grunt:"💀",runner:"💨",brute:"👹",pharaoh:"🏺",berserker:"😡",healer:"💚",shield:"🛡",flyer:"🦇",boss:"👑",titan:"🔥",splitter:"🧬",armored:"⚙",mini:"🐜"};
 function meta(){try{const m=JSON.parse(localStorage.getItem("cg3d_meta")||"null");if(m&&m.lv)return m}catch(e){}return{gems:0,lv:{gold:0,dmg:0,hp:0,abil:0,hero:0}}}
 function saveMeta(m){try{localStorage.setItem("cg3d_meta",JSON.stringify(m))}catch(e){}}
 const SHOP=[{k:"hero",n:"قوة البطل 🛡",d:"+٢٥٪ ضرر البطل و+٢٠٪ سرعة ضرب",base:6},{k:"gold",n:"ذهب البداية",d:"+٤٠ ذهب في كل مرحلة",base:6},{k:"dmg",n:"قوة الأبراج",d:"+٨٪ ضرر لكل الأبراج",base:8},{k:"hp",n:"أسوار القلعة",d:"+٢ حياة",base:7},{k:"abil",n:"سحر أسرع",d:"-٦٪ انتظار النيزك والتجميد",base:8}];
@@ -488,7 +490,7 @@ function waveComp(w0){
   else if(w==13){push("flyer",14);push("brute",6);push("healer",3)}
   else if(w==14){push("dragon",1);push("brute",8);push("shield",8);push("healer",5);push("runner",10)}
   else if(w==15){push("titan",1);push("boss",1);push("healer",4);push("flyer",8);push("brute",6)}
-  if((stageIdx==5||stageIdx==6)&&(w==11||w==15))push("ghostking",1);
+  if((stageIdx==5||stageIdx==6)&&(w==11||w==15))push(stageIdx==6?"pharaoh":"ghostking",1);
   if(w>=6&&w!=8&&w!=15)push("berserker",Math.floor((w-4)/2));
   if(w>=9&&w!=8&&w!=15)push("wraith",Math.floor((w-6)/2));
   if(w>=5&&w!=8&&w!=15)push("armored",Math.floor((w-3)/2));
@@ -917,6 +919,7 @@ function updateEnemies(dt){
   for(const e of enemies){
     if(e.dead)continue;
     flashTick(e,dt);
+    if(e.t=="pharaoh"&&e.hp<e.max){e.hp=Math.min(e.max,e.hp+e.max*.012*dt);e.fg.scale.x=clamp(e.hp/e.max,0,1);e.fg.position.x=-(1-e.fg.scale.x)*.63;window.__preg=1}
     {const sk=e.pois?1:e.slowT>0?2:e.stun>0?3:0;if(e.stk!==sk){e.stk=sk;e.stb.visible=sk>0;if(sk)e.stb.material.color.setHex(sk==1?0x34d399:sk==2?0x38bdf8:0xfacc15);window.__stk=sk}}
     if(e.pois){e.pois.t-=dt;e.pois.acc+=dt;if(e.pois.acc>=.5){e.pois.acc-=.5;burst(e.m.position,0x34d399,2,2);damage(e,e.pois.dps*.5);window.__pdmg=(window.__pdmg||0)+1;if(e.dead)continue}if(e.pois.t<=0)e.pois=null}
     if(e.delay>0){e.delay-=dt;e.m.visible=e.delay<=0;e.hbG.visible=e.m.visible;continue}
