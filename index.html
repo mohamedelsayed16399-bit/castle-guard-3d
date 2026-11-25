@@ -331,15 +331,18 @@ const TW={
   lv:[{cost:130,dmg:22,rate:.8,range:5,chain:3},{cost:110,dmg:34,rate:.85,range:5.4,chain:4},{cost:185,dmg:52,rate:.9,range:5.8,chain:5},{cost:320,dmg:80,rate:.95,range:6.2,chain:7}],col:0xfde047},
  mortar:{n:"هاون",ic:"🌋",canFly:false,splash:2.4,stun:.8,desc:"قصف بعيد يُذهل",
   lv:[{cost:150,dmg:34,rate:.5,range:7.5,splash:2.4,stun:.8},{cost:130,dmg:55,rate:.52,range:7.9,splash:2.6,stun:.9},{cost:220,dmg:88,rate:.55,range:8.3,splash:2.8,stun:1},{cost:380,dmg:140,rate:.6,range:8.8,splash:3.1,stun:1.2}],col:0xfb7185},
+ venom:{n:"سم",ic:"🧪",canFly:true,desc:"سم بيحرق العدو مع الوقت",
+  lv:[{cost:90,dmg:7,rate:1.1,range:5,pt:4},{cost:75,dmg:12,rate:1.2,range:5.3,pt:4},{cost:120,dmg:19,rate:1.3,range:5.6,pt:5},{cost:210,dmg:30,rate:1.4,range:6,pt:6}],col:0x10b981},
 };
 const TARGET_MODES=["first","strong","close"],TMN={first:"الأقرب للقلعة",strong:"الأقوى",close:"الأقرب للبرج"};
 function towerModel(type,lv){
   const d=TW[type],g=new THREE.Group();
   const kind=type=="archer"?"towerA":(type=="cannon"||type=="mortar")?"catapult":"towerB";
-  const hh={archer:2.6,cannon:2.3,frost:3.0,sniper:3.4,tesla:3.1,mortar:2.1}[type]*(1+.07*(lv-1));
+  const hh={archer:2.6,cannon:2.3,frost:3.0,sniper:3.4,tesla:3.1,mortar:2.1,venom:2.7}[type]*(1+.07*(lv-1));
   const m=inst(kind,{h:hh,tint:d.col,tintMix:.38});g.add(m);
   if(type=="frost"||type=="tesla"){const orb=new THREE.Mesh(new THREE.IcosahedronGeometry(.26+lv*.04,1),new THREE.MeshBasicMaterial({color:type=="frost"?0x9be4ff:0xfff176}));orb.position.y=hh+.3;g.add(orb);g.userData.orb=orb;
     const pl=new THREE.PointLight(d.col,.9,4);pl.position.y=hh+.3;g.add(pl)}
+  if(type=="venom"){const fl=new THREE.Mesh(new THREE.SphereGeometry(.28+lv*.03,10,8),new THREE.MeshBasicMaterial({color:0x34d399,transparent:true,opacity:.85}));fl.position.y=hh+.3;g.add(fl);g.userData.orb=fl}
   if(type=="sniper"){const sc=new THREE.Mesh(new THREE.TorusGeometry(.2,.05,6,14),new THREE.MeshBasicMaterial({color:0xe879f9}));sc.position.y=hh+.35;sc.rotation.x=Math.PI/2;g.add(sc);g.userData.orb=sc}
   if(type=="cannon"||type=="mortar")g.userData.barrel=true;
   if(lv==4){const rg=new THREE.Mesh(new THREE.TorusGeometry(.8,.06,6,28),new THREE.MeshBasicMaterial({color:0xfacc15,transparent:true,opacity:.9}));rg.rotation.x=Math.PI/2;rg.position.y=.15;g.add(rg);g.userData.ring=rg}
@@ -572,7 +575,7 @@ function openPop(tw){
   const t=TW[tw.type],lv=tw.lv,cur=t.lv[lv-1],nxt=lv<4?t.lv[lv]:null;
   const p=$("pop");
   const up=nxt?'<button class="up" id="pup">⬆ ترقية '+AR(nxt.cost)+'<br><small style="font-weight:600">ضرر '+AR(cur.dmg)+' ← '+AR(nxt.dmg)+' • مدى '+AR(cur.range)+' ← '+AR(nxt.range)+'</small></button>':"";
-  p.innerHTML='<div class="pi">'+t.ic+" "+t.n+"<br>مستوى "+AR(lv)+(lv==4?" (ماكس)":"")+"<br>ضرر "+AR(cur.dmg)+" • مدى "+AR(cur.range)+"<br>☠ قتل "+AR(tw.kills||0)+(lv==4?"<br>✨ "+({archer:"سهمين في نفس الوقت",cannon:"أقوى مدفع",frost:"نبضة تجميد كل ٧ ثواني",sniper:"٤٠٪ ضربة حرجة ×٢",tesla:"برق أطول",mortar:"أقوى هاون"}[tw.type]):"")+(()=>{const y=synergy(tw);return y.n?"<br>🤝 تحالف +"+AR(Math.round((y.m-1)*100))+"٪":"<br><small>🤝 حطه جنب أبراج مختلفة +٨٪ لكل نوع</small>"})()+"</div>"
+  p.innerHTML='<div class="pi">'+t.ic+" "+t.n+"<br>مستوى "+AR(lv)+(lv==4?" (ماكس)":"")+"<br>ضرر "+AR(cur.dmg)+" • مدى "+AR(cur.range)+"<br>☠ قتل "+AR(tw.kills||0)+(lv==4?"<br>✨ "+({archer:"سهمين في نفس الوقت",cannon:"أقوى مدفع",frost:"نبضة تجميد كل ٧ ثواني",sniper:"٤٠٪ ضربة حرجة ×٢",tesla:"برق أطول",mortar:"أقوى هاون",venom:"سم أقوى ٦ ثواني"}[tw.type]):"")+(()=>{const y=synergy(tw);return y.n?"<br>🤝 تحالف +"+AR(Math.round((y.m-1)*100))+"٪":"<br><small>🤝 حطه جنب أبراج مختلفة +٨٪ لكل نوع</small>"})()+"</div>"
     +up
     +'<button id="ptg">🎯 '+TMN[tw.mode]+'</button>'
     +'<button class="sell" id="psl">💰 بيع '+AR(tw.sellVal)+'</button>';
@@ -776,7 +779,7 @@ function fireTower(tw,dt){
     return;
   }
   // projectiles
-  const arch=tw.type=="archer",frost=tw.type=="frost",mort=tw.type=="mortar";
+  const arch=tw.type=="archer",frost=tw.type=="frost"||tw.type=="venom",mort=tw.type=="mortar";
   const geo=arch?new THREE.ConeGeometry(.07,.4,5):frost?new THREE.IcosahedronGeometry(.16):mort?new THREE.SphereGeometry(.28,8,6):new THREE.SphereGeometry(.2,8,6);
   const m=new THREE.Mesh(geo,new THREE.MeshBasicMaterial({color:frost?0x7dd3fc:mort?0xfb7185:arch?0xd9f99d:0xffa726}));
   m.position.copy(from);scene.add(m);
@@ -897,6 +900,7 @@ const tmpV=new V3();
 function updateEnemies(dt){
   for(const e of enemies){
     if(e.dead)continue;
+    if(e.pois){e.pois.t-=dt;e.pois.acc+=dt;if(e.pois.acc>=.5){e.pois.acc-=.5;burst(e.m.position,0x34d399,2,2);damage(e,e.pois.dps*.5);window.__pdmg=(window.__pdmg||0)+1;if(e.dead)continue}if(e.pois.t<=0)e.pois=null}
     if(e.delay>0){e.delay-=dt;e.m.visible=e.delay<=0;e.hbG.visible=e.m.visible;continue}
     if(e.mx)e.mx.update(e.stun>0?0:dt*(e.slowT>0?1-e.slow:1));
     if(e.stun>0){e.stun-=dt;if(Math.random()<dt*4)burst(e.m.position,0x7dd3fc,1,1)}
@@ -961,6 +965,7 @@ function updateShots(dt){
       if(s.kind=="dart"||s.kind=="bolt"){
         if(tgt&&!tgt.dead){
           lastTw=s.twr;damage(tgt,s.dmg);lastTw=null;
+          if(s.tw=="venom"){tgt.pois={t:s.cur.pt,dps:s.dmg*.9,acc:0};burst(tp,0x34d399,4,2);window.__pois=(window.__pois||0)+1}
           if(s.tw=="frost"){tgt.slow=Math.max(tgt.slow,s.cur.slow);tgt.slowT=Math.max(tgt.slowT,s.cur.slowT);burst(tp,0x7dd3fc,3,2)}
         }
       }else{ // shell / mortar splash
