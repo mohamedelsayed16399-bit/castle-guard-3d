@@ -373,6 +373,7 @@ const EN={
  bat:{hp:28,spd:3.4,gold:5,dmg:1,scale:.42,col:0x7c3aed,fly:true,name:"خفاش"},
  ghostking:{hp:5200,spd:.95,gold:420,dmg:15,scale:1.75,col:0xa78bfa,boss:true,name:"ملك الأشباح"},
  berserker:{hp:380,spd:1.3,gold:28,dmg:3,scale:.95,col:0xef4444,name:"مسعور"},
+ wisp:{hp:70,spd:3.6,gold:9,dmg:1,scale:.5,col:0xe879f9,fly:true,name:"شبح الفراغ"},
  voidlord:{hp:11000,spd:.85,gold:600,dmg:25,scale:1.85,col:0xa21caf,boss:true,armor:true,name:"سيّد الفراغ"},
  pharaoh:{hp:7800,spd:.9,gold:450,dmg:18,scale:1.7,col:0xd4af37,boss:true,armor:true,name:"الفرعون"},
  mini:{hp:34,spd:3.2,gold:2,dmg:1,scale:.42,col:0xfb923c,name:"صغير"},
@@ -384,6 +385,7 @@ function enemyModel(t){
   const cfg={ghostking:["sk_warrior",{anim:"Walking_B",animSpeed:.8,tint:0xa78bfa,tintMix:.7,emissive:0x6d28d9,ei:.7}],bat:["sk_minion",{anim:"Jump_Idle",tint:0x7c3aed,tintMix:.6}],dragon:["sk_mage",{anim:"Jump_Idle",tint:0xdc2626,tintMix:.65,emissive:0xff2200,ei:.5}],wraith:["sk_rogue",{anim:"Walking_A",animSpeed:1.1,tint:0xa78bfa,tintMix:.7,emissive:0x5b21b6,ei:.6}],splitter:["sk_rogue",{anim:"Walking_A",animSpeed:1.2,tint:0xff9a4d,tintMix:.55}],armored:["sk_warrior",{anim:"Walking_A",animSpeed:.9,tint:0xd9b44a,tintMix:.6,emissive:0x553300,ei:.3}],mini:["sk_minion",{anim:"Running_A",animSpeed:1.5,tint:0xfb923c,tintMix:.5}],grunt:["sk_minion",{anim:"Walking_A",animSpeed:1.3}],runner:["sk_rogue",{anim:"Running_A",animSpeed:1.3}],brute:["sk_warrior",{anim:"Walking_B",animSpeed:.9,tint:0x9a6bff,tintMix:.45}],
     healer:["sk_mage",{anim:"Walking_A",tint:0x6ee7a0,tintMix:.5}],shield:["sk_warrior",{anim:"Walking_A",tint:0x8fa6c4,tintMix:.5}],flyer:["sk_mage",{anim:"Jump_Idle",tint:0x67e8f9,tintMix:.55}],
     berserker:["sk_warrior",{anim:"Walking_A",animSpeed:1.1,tint:0xef4444,tintMix:.55,emissive:0x991b1b,ei:.4}],
+    wisp:["sk_minion",{anim:"Jump_Idle",tint:0xe879f9,tintMix:.7,emissive:0xa21caf,ei:.7}],
     voidlord:["sk_warrior",{anim:"Walking_B",animSpeed:.7,tint:0x6b21a8,tintMix:.75,emissive:0xe11d48,ei:.8}],
     pharaoh:["sk_warrior",{anim:"Walking_B",animSpeed:.75,tint:0xffd34d,tintMix:.7,emissive:0xb8860b,ei:.5}],
     boss:["sk_warrior",{anim:"Walking_B",animSpeed:.8,tint:0x555555,tintMix:.6,emissive:0xff2200,ei:.35}],titan:["sk_warrior",{anim:"Walking_B",animSpeed:.7,tint:0x7a1212,tintMix:.55,emissive:0xff3300,ei:.5}]}[t];
@@ -413,7 +415,7 @@ function chkAch(){dchTick();try{localStorage.setItem("cg3d_stats",JSON.stringify
 function showAch(){$("achl").innerHTML=ACHS.map(a=>(XAH[a[0]]?"✅ ":"🔒 ")+"<b>"+a[1]+"</b> · "+a[2]).join("<br>");
  $("achs").textContent="قتلى "+XST.kills+" · جولات "+XST.runs+" · انتصارات "+XST.wins+" · أعلى موجة لانهائي "+XST.endw;$("ach").classList.add("on");$("achx").onclick=()=>$("ach").classList.remove("on")}
 let endless=false,hard=localStorage.getItem("cg3d_hard")=="1",combo=0,lastKill=-9,slowmo=0,DMGM=1;
-const EMO={ghostking:"👻",bat:"🦇",dragon:"🐉",wraith:"👻",grunt:"💀",runner:"💨",brute:"👹",pharaoh:"🏺",voidlord:"🌑",berserker:"😡",healer:"💚",shield:"🛡",flyer:"🦇",boss:"👑",titan:"🔥",splitter:"🧬",armored:"⚙",mini:"🐜"};
+const EMO={ghostking:"👻",bat:"🦇",dragon:"🐉",wraith:"👻",grunt:"💀",runner:"💨",brute:"👹",pharaoh:"🏺",voidlord:"🌑",wisp:"✨",berserker:"😡",healer:"💚",shield:"🛡",flyer:"🦇",boss:"👑",titan:"🔥",splitter:"🧬",armored:"⚙",mini:"🐜"};
 function meta(){try{const m=JSON.parse(localStorage.getItem("cg3d_meta")||"null");if(m&&m.lv)return m}catch(e){}return{gems:0,lv:{gold:0,dmg:0,hp:0,abil:0,hero:0}}}
 function saveMeta(m){try{localStorage.setItem("cg3d_meta",JSON.stringify(m))}catch(e){}}
 const SHOP=[{k:"hero",n:"قوة البطل 🛡",d:"+٢٥٪ ضرر البطل و+٢٠٪ سرعة ضرب",base:6},{k:"gold",n:"ذهب البداية",d:"+٤٠ ذهب في كل مرحلة",base:6},{k:"dmg",n:"قوة الأبراج",d:"+٨٪ ضرر لكل الأبراج",base:8},{k:"hp",n:"أسوار القلعة",d:"+٢ حياة",base:7},{k:"abil",n:"سحر أسرع",d:"-٦٪ انتظار النيزك والتجميد",base:8}];
@@ -502,6 +504,7 @@ function waveComp(w0){
   else if(w==14){push("dragon",1);push("brute",8);push("shield",8);push("healer",5);push("runner",10)}
   else if(w==15){push("titan",1);push("boss",1);push("healer",4);push("flyer",8);push("brute",6)}
   if((stageIdx==5||stageIdx==6||stageIdx==7)&&(w==11||w==15))push(stageIdx==7?"voidlord":stageIdx==6?"pharaoh":"ghostking",1);
+  if(stageIdx==7&&w>=3&&w!=8&&w!=15)push("wisp",3+w);
   if(w>=6&&w!=8&&w!=15)push("berserker",Math.floor((w-4)/2));
   if(w>=9&&w!=8&&w!=15)push("wraith",Math.floor((w-6)/2));
   if(w>=5&&w!=8&&w!=15)push("armored",Math.floor((w-3)/2));
@@ -956,6 +959,7 @@ function updateEnemies(dt){
   for(const e of enemies){
     if(e.dead)continue;
     flashTick(e,dt);
+    if(e.t=="wisp"&&e.delay<=0&&!(e.stun>0)){e.wk=(e.wk==null?1+Math.random()*2:e.wk)-dt;if(e.wk<=0){e.wk=3;burst(e.m.position,0xe879f9,6,4);e.prog+=.02;e.dist+=1.2;window.__wblink=(window.__wblink||0)+1}}
     if(e.t=="voidlord"&&e.delay<=0&&!(e.stun>0)){if(e.bk==null)e.bk=5;e.bk-=dt;if(e.bk<=0){e.bk=e.hp<e.max*.5?4:7;burst(e.m.position,0xe11d48,22,8);e.prog+=.035;e.dist+=2.1;floatText(e.m.position,"🌀 وميض","#e879f9");window.__blink=(window.__blink||0)+1}}
     if(e.t=="pharaoh"&&e.hp<e.max){e.hp=Math.min(e.max,e.hp+e.max*.012*dt);e.fg.scale.x=clamp(e.hp/e.max,0,1);e.fg.position.x=-(1-e.fg.scale.x)*.63;window.__preg=1}
     {const sk=e.pois?1:e.slowT>0?2:e.stun>0?3:0;if(e.stk!==sk){e.stk=sk;e.stb.visible=sk>0;if(sk)e.stb.material.color.setHex(sk==1?0x34d399:sk==2?0x38bdf8:0xfacc15);window.__stk=sk}}
@@ -1087,6 +1091,7 @@ function updateTowers(dt){
 // ambient animation
 let clockT=0;
 function updateAmbient(dt){
+  if(window.__vportal){const P=window.__vportal;P.children.forEach((c,i)=>{if(c.userData.sp)c.rotation.z+=c.userData.sp*dt;if(c.userData.ang!=null){const a=c.userData.ang+clockT*.6;c.position.set(Math.cos(a)*7.5,Math.sin(a)*7.5,0);c.rotation.y+=dt*2}})}
   clockT+=dt;for(const c of clouds){c.position.x+=dt*.5;if(c.position.x>60)c.position.x=-60}for(const k of (scene.userData.kn||[]))k.userData.mixer&&k.userData.mixer.update(dt);
   for(const f of flames){f.scale.y=1+Math.sin(clockT*11+f.position.x)*.25;f.scale.x=1+Math.cos(clockT*13)*.15}
   for(const fl of flags){const pos=fl.geometry.attributes.position;
@@ -1120,6 +1125,12 @@ function waveDoneCheck(){
 // ---------- game flow ----------
 function newGame(si){
   if(typeof si=="number")setStage(si);else setStage(stageIdx);
+  if(window.__vportal){scene.remove(window.__vportal);window.__vportal=null}
+  if(stageIdx==7){const G=new THREE.Group();const cols=[0xe879f9,0xe11d48,0x7c3aed];
+    for(let i=0;i<3;i++){const t=new THREE.Mesh(new THREE.TorusGeometry(5+i*1.6,.22,8,48),new THREE.MeshBasicMaterial({color:cols[i],transparent:true,opacity:.85,fog:false}));t.userData.sp=(i%2?-1:1)*(.5+i*.3);G.add(t)}
+    const disc=new THREE.Mesh(new THREE.CircleGeometry(4.8,32),new THREE.MeshBasicMaterial({color:0x05010a,fog:false}));disc.position.z=-.05;G.add(disc);
+    for(let i=0;i<8;i++){const c=new THREE.Mesh(new THREE.OctahedronGeometry(.6,0),new THREE.MeshBasicMaterial({color:i%2?0xe879f9:0xe11d48,fog:false}));c.userData.ang=i/8*Math.PI*2;G.add(c)}
+    G.position.set(0,2.5,-(ROWS*CS/2)-1.5);G.scale.setScalar(.55);G.rotation.x=-.7;scene.add(G);window.__vportal=G}
   if(endless)WMAX=1e9;
   buildMap();buildWeather();applyMeta();
   for(const e of enemies){scene.remove(e.m);scene.remove(e.hbG)}
