@@ -917,6 +917,8 @@ loop();
 buildMap();renderStages();
 {const h=hs();if(h.wave>0)$("hsline").textContent="🏅 أحسن نتيجة: موجة "+AR(h.wave)+" — ☠ "+AR(h.kills)}
 // debug/testing hook
+document.addEventListener("visibilitychange",()=>{if(document.hidden&&state=="play"&&!paused){paused=true;$("pause").classList.add("on")}});
+addEventListener("keydown",e=>{if(e.key=="Escape"||e.key=="p"||e.key=="P"){if(state=="play"){paused=!paused;$("pause").classList.toggle("on",paused)}}});
 window.__endless=v=>{endless=v};window.__w=()=>({enemiesTypes:enemies.map(e=>e.t),weather:!!weather,meta:meta()});
 window.__win=()=>gameOver(true);
 window.__g=()=>({state,wave,lives,gold,kills,en:enemies.filter(e=>!e.dead).length,tw:towers.length,q:queue.length,inWave,parts:parts.length,shots:shots.length});
@@ -931,4 +933,5 @@ window.__towers=()=>towers.map(t=>({type:t.type,lv:t.lv,c:t.c,r:t.r}));
 </script>
 </body>
 </html>
+
 
