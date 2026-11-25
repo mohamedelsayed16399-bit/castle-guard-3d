@@ -1127,7 +1127,7 @@ function renderStages(){
 }
 function toMenu(){state="menu";$("heal").style.display="none";$("ult").style.display="none";$("modb").style.display="none";paused=false;perkOpen=false;$("perk").classList.remove("on");$("end").classList.remove("on");$("pause").classList.remove("on");renderStages();$("start").classList.add("on")}
 function gameOver(win){
-  state="over";{const ks=Object.keys(window.KB||{}).sort((a,b)=>KB[b]-KB[a]).slice(0,6);$("ek").textContent=ks.length?"القتلى: "+ks.map(k=>(EMO[k]||"•")+AR(KB[k])).join("  "):"";window.__ek=$("ek").textContent}$("heal").style.display="none";$("ult").style.display="none";$("modb").style.display="none";saveHs();XST.runs++;if(!endless){try{const b=bwGet();b[stageIdx]=Math.max(b[stageIdx]||0,win?WMAX:wave);localStorage.setItem("cg3d_bw",JSON.stringify(b))}catch(e){}}XST.kills+=0;
+  state="over";{const ks=Object.keys(window.KB||{}).sort((a,b)=>KB[b]-KB[a]).slice(0,6);$("ek").textContent=ks.length?"القتلى: "+ks.map(k=>(EMO[k]||"•")+AR(KB[k])).join("  "):"";{let mv=null;for(const t of towers)if((t.kills||0)>0&&(!mv||t.kills>mv.kills))mv=t;if(mv){$("ek").textContent+=($("ek").textContent?"\n":"")+"🏆 أحسن برج: "+TW[mv.type].ic+" "+TW[mv.type].n+" ("+AR(mv.kills)+" قتيل)"}$("ek").style.whiteSpace="pre-line"}window.__ek=$("ek").textContent}$("heal").style.display="none";$("ult").style.display="none";$("modb").style.display="none";saveHs();XST.runs++;if(!endless){try{const b=bwGet();b[stageIdx]=Math.max(b[stageIdx]||0,win?WMAX:wave);localStorage.setItem("cg3d_bw",JSON.stringify(b))}catch(e){}}XST.kills+=0;
   if(win&&!endless){XST.wins++;if(hard)XST.hardwin++;if(stageIdx==5)XST.camp=true}
   if(endless)XST.endw=Math.max(XST.endw,wave);
   const h=hs();
