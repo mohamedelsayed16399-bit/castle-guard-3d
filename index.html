@@ -684,6 +684,10 @@ let wk0=0;function startWave(auto){wk0=kills;
   hud();mkBar();
 }
 // ---------- combat ----------
+let coinG=null,coinM=null;
+function coinPop(p,n){if(!coinG){coinG=new THREE.CylinderGeometry(.2,.2,.05,12);coinG.rotateX(Math.PI/2);coinM=new THREE.MeshBasicMaterial({color:0xfacc15,transparent:true})}
+  n=Math.min(n,5);for(let i=0;i<n&&parts.length<220;i++){const m=new THREE.Mesh(coinG,coinM.clone());m.position.copy(p);m.position.y+=.6;scene.add(m);
+    parts.push({m,v:new V3((Math.random()-.5)*3,5+Math.random()*3,(Math.random()-.5)*3),l:.9,tl:.9,spin:12+Math.random()*8})}window.__coins=(window.__coins||0)+n}
 function burst(p,col,n=8,up=4){
   for(let i=0;i<n&&parts.length<220;i++){
     const m=new THREE.Mesh(new THREE.BoxGeometry(.15,.15,.15),new THREE.MeshBasicMaterial({color:col,transparent:true}));
@@ -739,7 +743,7 @@ function damage(e,amt,crit=false){
   if(e.hp<=0)kill(e);
 }
 function kill(e){
-  if(e.by&&towers.includes(e.by))e.by.kills=(e.by.kills||0)+1;e.dead=true;kills++;window.KB=window.KB||{};KB[e.t]=(KB[e.t]||0)+1;XST.kills++;comboHit();if((XST.kills&7)==0)chkAch();{const g0=Math.round(e.d.gold*perk.gold*(mod&&mod.gold||1));gold+=g0;goldEarned+=g0;floatText(e.m.position,"+"+g0,e.d.boss?"#f472b6":"#fde047")}
+  if(e.by&&towers.includes(e.by))e.by.kills=(e.by.kills||0)+1;e.dead=true;kills++;window.KB=window.KB||{};KB[e.t]=(KB[e.t]||0)+1;XST.kills++;comboHit();if((XST.kills&7)==0)chkAch();{const g0=Math.round(e.d.gold*perk.gold*(mod&&mod.gold||1));gold+=g0;goldEarned+=g0;coinPop(e.m.position,e.d.boss?5:Math.max(1,Math.ceil(g0/10)));floatText(e.m.position,"+"+g0,e.d.boss?"#f472b6":"#fde047")}
   combo=(clockT-lastKill<2.2)?combo+1:1;lastKill=clockT;
   if(combo>=6&&combo%6==0){const b=combo;gold+=b;goldEarned+=b;floatText(e.m.position,"🔥x"+combo+" +"+b,"#fb923c")}
   if(e.d.splits){for(let i=0;i<2;i++){const c=spawnEnemy("mini");c.prog=Math.max(0,(e.prog||0)-.01*i);c.dist=e.dist;const p=curve.getPointAt(clamp(c.prog,0,1));c.m.position.set(p.x,0,p.z)}burst(e.m.position,0xf97316,12,5)}
@@ -1018,7 +1022,7 @@ function updateParts(dt){
     p.l-=dt;
     if(p.line){p.m.material.opacity=Math.max(p.l/p.tl,0)}
     else if(p.ring){const k=1-p.l/p.tl;p.m.scale.setScalar(1+k*p.ring);p.m.material.opacity=(1-k)*.9}
-    else{p.m.position.addScaledVector(p.v,dt);p.v.y-=12*dt;p.m.material.opacity=Math.max(p.l/p.tl,0);p.m.material.transparent=true}
+    else{if(p.spin)p.m.rotation.y+=p.spin*dt;p.m.position.addScaledVector(p.v,dt);p.v.y-=12*dt;p.m.material.opacity=Math.max(p.l/p.tl,0);p.m.material.transparent=true}
     if(p.l<=0){scene.remove(p.m);p.gone=true}
   }
   parts=parts.filter(p=>!p.gone);
