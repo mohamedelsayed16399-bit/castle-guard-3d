@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#07111f">
-<title>حارس القلعة 3D — النسخة المطورة</title>
+<title>حارس القلعة 3D — النسخة الأسطورية</title>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
 html,body{margin:0;height:100%;background:#07111f;overflow:hidden;font-family:system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif;color:#fff;touch-action:manipulation}
@@ -55,6 +55,15 @@ canvas{display:block;position:fixed;inset:0;touch-action:none}
 .sc.cur{border-color:#facc15;box-shadow:0 0 18px #facc1566}
 .btn.sm{padding:12px 30px;font-size:17px;background:linear-gradient(180deg,#334155,#1e293b);color:#fff;box-shadow:none}
 #stn{font-size:20px;color:#facc15;font-weight:900;min-height:28px}
+#pv{margin-top:6px;font-size:12px;color:#e2e8f0;text-align:center;text-shadow:0 1px 4px #000;min-height:16px}
+.mini{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.btn.xs{padding:10px 18px;font-size:15px;background:linear-gradient(180deg,#334155,#1e293b);color:#fff;box-shadow:none}
+.btn.xs.on{background:linear-gradient(180deg,#ef4444,#991b1b)}
+.shr{display:flex;align-items:center;justify-content:space-between;gap:10px;width:min(92vw,440px);background:#ffffff10;border:1px solid #ffffff22;border-radius:14px;padding:10px 14px;font-size:14px;text-align:right}
+#shop{background:#050b16fa;z-index:7}
+.shr b{display:block;color:#facc15;font-size:15px}
+.shr button{background:linear-gradient(180deg,#facc15,#d97706);border:0;border-radius:10px;padding:9px 14px;font-weight:800;font-family:inherit;cursor:pointer;min-width:84px}
+.shr button.dis{opacity:.4}
 </style>
 </head>
 <body>
@@ -67,6 +76,7 @@ canvas{display:block;position:fixed;inset:0;touch-action:none}
     <span class="it" id="gold">💰 ٢٠٠</span>
   </div>
   <div id="wbar"><div id="wfill"></div></div>
+  <div id="pv"></div>
 </div>
 <div id="msg"></div>
 <div id="banner"></div>
@@ -80,6 +90,7 @@ canvas{display:block;position:fixed;inset:0;touch-action:none}
   <div id="stn"></div>
   <p class="hs" id="hsline"></p>
   <button class="btn" id="go">ابدأ اللعب</button>
+  <div class="mini"><button class="btn xs" id="endlessb">♾ لانهائي</button><button class="btn xs" id="hardb">🔥 صعب</button><button class="btn xs" id="shopb">💎 تحسينات</button></div>
 </div>
 <div class="ov" id="end">
   <h1 id="et"></h1>
@@ -89,6 +100,7 @@ canvas{display:block;position:fixed;inset:0;touch-action:none}
   <button class="btn" id="again">العب تاني</button>
   <button class="btn sm" id="tomenu">كل المراحل</button>
 </div>
+<div class="ov" id="shop"><h1>💎 تحسينات دائمة</h1><p id="gemline"></p><div id="shl" style="display:flex;flex-direction:column;gap:8px"></div><button class="btn sm" id="shback">رجوع</button></div>
 <div class="ov" id="pause"><h1>⏸ وقفة</h1><button class="btn" id="resume">كمّل</button><button class="btn sm" id="pmenu">كل المراحل</button></div>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
 <script type="module">
@@ -307,6 +319,7 @@ function towerModel(type,lv){
     const pl=new THREE.PointLight(d.col,.9,4);pl.position.y=hh+.3;g.add(pl)}
   if(type=="sniper"){const sc=new THREE.Mesh(new THREE.TorusGeometry(.2,.05,6,14),new THREE.MeshBasicMaterial({color:0xe879f9}));sc.position.y=hh+.35;sc.rotation.x=Math.PI/2;g.add(sc);g.userData.orb=sc}
   if(type=="cannon"||type=="mortar")g.userData.barrel=true;
+  if(lv==4){const rg=new THREE.Mesh(new THREE.TorusGeometry(.8,.06,6,28),new THREE.MeshBasicMaterial({color:0xfacc15,transparent:true,opacity:.9}));rg.rotation.x=Math.PI/2;rg.position.y=.15;g.add(rg);g.userData.ring=rg}
   // level pips
   for(let i=0;i<lv;i++){const a=(i-(lv-1)/2)*.5;const p=new THREE.Mesh(new THREE.SphereGeometry(.11,8,6),new THREE.MeshStandardMaterial({color:0xfacc15,emissive:0xf59e0b,emissiveIntensity:.8}));p.position.set(Math.sin(a)*.95,.25,Math.cos(a)*.95);g.add(p)}
   return g;
@@ -319,12 +332,15 @@ const EN={
  healer:{hp:130,spd:1.8,gold:20,dmg:1,scale:.66,col:0x22c55e,heals:true,name:"معالج"},
  shield:{hp:200,spd:1.6,gold:18,dmg:2,scale:.72,col:0x64748b,shielded:true,name:"درع"},
  flyer:{hp:70,spd:2.8,gold:14,dmg:1,scale:.55,col:0x06b6d4,fly:true,name:"طيّار"},
+ splitter:{hp:170,spd:1.9,gold:16,dmg:1,scale:.78,col:0xf97316,splits:true,name:"منقسم"},
+ armored:{hp:260,spd:1.5,gold:24,dmg:2,scale:.85,col:0xd4a017,armor:true,name:"مدرّع"},
+ mini:{hp:34,spd:3.2,gold:2,dmg:1,scale:.42,col:0xfb923c,name:"صغير"},
  boss:{hp:3400,spd:.95,gold:250,dmg:12,scale:1.55,col:0x111111,boss:true,name:"الزعيم"},
  titan:{hp:6500,spd:.8,gold:500,dmg:20,scale:1.9,col:0x450a0a,boss:true,name:"العملاق"},
 };
 function enemyModel(t){
   const d=EN[t],g=new THREE.Group(),H=2.3*d.scale;
-  const cfg={grunt:["sk_minion",{anim:"Walking_A",animSpeed:1.3}],runner:["sk_rogue",{anim:"Running_A",animSpeed:1.3}],brute:["sk_warrior",{anim:"Walking_B",animSpeed:.9,tint:0x9a6bff,tintMix:.45}],
+  const cfg={splitter:["sk_rogue",{anim:"Walking_A",animSpeed:1.2,tint:0xff9a4d,tintMix:.55}],armored:["sk_warrior",{anim:"Walking_A",animSpeed:.9,tint:0xd9b44a,tintMix:.6,emissive:0x553300,ei:.3}],mini:["sk_minion",{anim:"Running_A",animSpeed:1.5,tint:0xfb923c,tintMix:.5}],grunt:["sk_minion",{anim:"Walking_A",animSpeed:1.3}],runner:["sk_rogue",{anim:"Running_A",animSpeed:1.3}],brute:["sk_warrior",{anim:"Walking_B",animSpeed:.9,tint:0x9a6bff,tintMix:.45}],
     healer:["sk_mage",{anim:"Walking_A",tint:0x6ee7a0,tintMix:.5}],shield:["sk_warrior",{anim:"Walking_A",tint:0x8fa6c4,tintMix:.5}],flyer:["sk_mage",{anim:"Jump_Idle",tint:0x67e8f9,tintMix:.55}],
     boss:["sk_warrior",{anim:"Walking_B",animSpeed:.8,tint:0x555555,tintMix:.6,emissive:0xff2200,ei:.35}],titan:["sk_warrior",{anim:"Walking_B",animSpeed:.7,tint:0x7a1212,tintMix:.55,emissive:0xff3300,ei:.5}]}[t];
   const m=inst(cfg[0],Object.assign({h:H},cfg[1]));g.add(m);g.userData.mixer=m.userData.mixer;
@@ -339,13 +355,51 @@ function enemyModel(t){
 let gold,lives,wave,kills,dmgDealt,goldEarned,state="menu",enemies=[],towers=[],shots=[],parts=[],floats=[],queue=[],spT=0,inWave=false,speedMul=1,popTarget=null,msgT=0,buildType=null,ghost=null,ring,bossAlive=false,paused=false;
 let abMeteor={cd:0,max:26},abFreeze={cd:0,max:32};
 const V3=THREE.Vector3;
+let endless=false,hard=localStorage.getItem("cg3d_hard")=="1",combo=0,lastKill=-9,slowmo=0,DMGM=1;
+const EMO={grunt:"💀",runner:"💨",brute:"👹",healer:"💚",shield:"🛡",flyer:"🦇",boss:"👑",titan:"🔥",splitter:"🧬",armored:"⚙",mini:"🐜"};
+function meta(){try{const m=JSON.parse(localStorage.getItem("cg3d_meta")||"null");if(m&&m.lv)return m}catch(e){}return{gems:0,lv:{gold:0,dmg:0,hp:0,abil:0}}}
+function saveMeta(m){try{localStorage.setItem("cg3d_meta",JSON.stringify(m))}catch(e){}}
+const SHOP=[{k:"gold",n:"ذهب البداية",d:"+٤٠ ذهب في كل مرحلة",base:6},{k:"dmg",n:"قوة الأبراج",d:"+٨٪ ضرر لكل الأبراج",base:8},{k:"hp",n:"أسوار القلعة",d:"+٢ حياة",base:7},{k:"abil",n:"سحر أسرع",d:"-٦٪ انتظار النيزك والتجميد",base:8}];
+function shopCost(it,l){return it.base+l*it.base}
+function renderShop(){
+  const m=meta();$("gemline").textContent="💎 "+AR(m.gems)+" جوهرة — بتاخدها من الفوز والموجات";
+  const box=$("shl");box.innerHTML="";
+  for(const it of SHOP){const l=m.lv[it.k]||0,max=l>=6,c=shopCost(it,l);
+    const r=document.createElement("div");r.className="shr";
+    r.innerHTML="<div><b>"+it.n+" • مستوى "+AR(l)+"/٦</b>"+it.d+"</div>";
+    const b=document.createElement("button");b.textContent=max?"ماكس":"💎 "+AR(c);if(max||m.gems<c)b.className="dis";
+    b.onclick=()=>{const mm=meta();const ll=mm.lv[it.k]||0;const cc=shopCost(it,ll);if(ll>=6||mm.gems<cc)return;mm.gems-=cc;mm.lv[it.k]=ll+1;saveMeta(mm);sfx("build");renderShop()};
+    r.appendChild(b);box.appendChild(r)}
+}
+function applyMeta(){const m=meta();DMGM=1+.08*(m.lv.dmg||0);abMeteor.max=26*(1-.06*(m.lv.abil||0));abFreeze.max=32*(1-.06*(m.lv.abil||0))}
+// weather particles per stage
+let weather=null;
+function buildWeather(){
+  if(weather){scene.remove(weather);weather.geometry.dispose();weather=null}
+  const N=420,pos=new Float32Array(N*3),spd=[];
+  for(let i=0;i<N;i++){pos[i*3]=(Math.random()-.5)*46;pos[i*3+1]=Math.random()*22;pos[i*3+2]=(Math.random()-.5)*52;spd.push(.4+Math.random())}
+  const cfgW=[{c:0xfff3a0,sz:.12,vy:-.15,up:false},{c:0x8bd36a,sz:.22,vy:-1.1,up:false},{c:0xe8c98f,sz:.1,vy:-.2,up:false,wind:3},{c:0xffffff,sz:.2,vy:-2,up:false},{c:0xff7a1a,sz:.16,vy:2.2,up:true}][stageIdx]||{c:0xffffff,sz:.1,vy:-.2};
+  const g=new THREE.BufferGeometry();g.setAttribute("position",new THREE.BufferAttribute(pos,3));
+  weather=new THREE.Points(g,new THREE.PointsMaterial({color:cfgW.c,size:cfgW.sz,transparent:true,opacity:.85,depthWrite:false,sizeAttenuation:true}));
+  weather.userData={spd,cfg:cfgW};weather.frustumCulled=false;scene.add(weather);
+}
+function updateWeather(dt){
+  if(!weather)return;const p=weather.geometry.attributes.position,c=weather.userData.cfg,sp=weather.userData.spd;
+  for(let i=0;i<p.count;i++){
+    let y=p.getY(i)+c.vy*sp[i]*dt,x=p.getX(i)+Math.sin(clockT*.8+i)*dt*.6+(c.wind||0)*dt;
+    if(c.up?y>22:y<0){y=c.up?0:22;x=(Math.random()-.5)*46}
+    if(x>23)x=-23;
+    p.setXYZ(i,x,y,p.getZ(i));
+  }
+  p.needsUpdate=true;
+}
 // range ring + build ghost
 const ringM=new THREE.Mesh(new THREE.RingGeometry(1,1.06,56),new THREE.MeshBasicMaterial({color:0xfacc15,side:2,transparent:true,opacity:.85,depthWrite:false}));
 ringM.rotation.x=-Math.PI/2;ringM.position.y=.1;ringM.visible=false;scene.add(ringM);
 // spawn glow pulse helper ref
 function spawnEnemy(t,delay=0){
   const d=EN[t],m=enemyModel(t);
-  const ew=Math.ceil(wave*15/WMAX);const hpMul=ST.hp*(1+ (ew-1)*.16 + (ew>10?(ew-10)*.1:0));
+  const ew=endless?1+(wave-1)*.5:Math.ceil(wave*15/WMAX);const hpMul=ST.hp*(hard?1.35:1)*(1+ (ew-1)*.16 + (ew>10?(ew-10)*.1:0));
   const hpm=Math.round(d.hp*hpMul*(d.boss?1:1));
   m.position.copy(curve.getPointAt(0));
   scene.add(m);
@@ -360,7 +414,7 @@ function spawnEnemy(t,delay=0){
 }
 // waves: 15, composition via generator
 function waveComp(w0){
-  const w=Math.ceil(w0*15/WMAX);
+  const w=endless?((w0-1)%15)+1:Math.ceil(w0*15/WMAX);
   const q=[];
   const push=(t,n)=>{for(let i=0;i<n;i++)q.push(t)};
   if(w==1)push("grunt",6);
@@ -378,15 +432,23 @@ function waveComp(w0){
   else if(w==13){push("flyer",14);push("brute",6);push("healer",3)}
   else if(w==14){push("brute",8);push("shield",8);push("healer",5);push("runner",10)}
   else if(w==15){push("titan",1);push("boss",1);push("healer",4);push("flyer",8);push("brute",6)}
-  return q;
+  if(w>=5&&w!=8&&w!=15)push("armored",Math.floor((w-3)/2));
+  if(w>=7&&w!=8&&w!=15)push("splitter",Math.floor((w-4)/1.5));
+  if(endless){const ex=Math.floor((w0-1)/15);const base=q.slice();for(let k=0;k<ex*.7+(ex>0?.3:0);k++)for(const t of base){if(Math.random()<Math.min(1,ex*.7-k+.3))q.push(t)}
+    if(w0%10==0){push("titan",1+Math.floor(w0/30))}}
+  // shuffle lightly so special enemies are mixed in (bosses stay first)
+  const boss=q.filter(t=>EN[t].boss),rest=q.filter(t=>!EN[t].boss);
+  for(let i=rest.length-1;i>0;i--){if(Math.random()<.5){const j=Math.floor(Math.random()*(i+1));[rest[i],rest[j]]=[rest[j],rest[i]]}}
+  return boss.concat(rest);
 }
 function bannerShow(t,ms=2600){const b=$("banner");b.textContent=t;b.classList.add("on");clearTimeout(b._t);b._t=setTimeout(()=>b.classList.remove("on"),ms)}
 function say(t,ms=1800){const m=$("msg");m.textContent=t;m.style.opacity=1;msgT=ms/1000}
 function hud(){
   $("hp").textContent="❤️ "+AR(lives);
-  $("wv").textContent="🌊 "+AR(Math.max(wave,1))+"/"+AR(WMAX);
+  $("wv").textContent="🌊 "+AR(Math.max(wave,1))+(endless?" ♾":"/"+AR(WMAX));
   $("kl").textContent="☠ "+AR(kills);
   $("gold").textContent="💰 "+AR(gold);
+  if(!inWave&&state=="play"){const cnt={};for(const t of waveComp(wave+1))cnt[t]=(cnt[t]||0)+1;$("pv").textContent="التالية: "+Object.keys(cnt).map(t=>EMO[t]+AR(cnt[t])).join("  ")}else if(inWave)$("pv").textContent="";
   const total=inWave?queue.length+enemies.filter(e=>!e.dead).length:0;
   const wq=waveComp(wave).length||1;
   $("wfill").style.width=(inWave?100*(1-total/Math.max(wq,1)):0)+"%";
@@ -540,17 +602,24 @@ function chainZap(from,e,dmg,chain){
 }
 function damage(e,amt,crit=false){
   if(e.dead)return;
+  amt*=DMGM;
+  if(e.slowT>0)amt*=1.25;
+  if(e.d.armor&&amt<22)amt*=.45;
+  e.pop=.12;
   e.hp-=amt;dmgDealt+=amt;
   e.fg.scale.x=clamp(e.hp/e.max,0,1);e.fg.position.x=-(1-e.fg.scale.x)*.63;
   e.fg.material.color.setHex(e.hp/e.max>.5?0x22c55e:e.hp/e.max>.25?0xfacc15:0xef4444);
-  if(amt>=25||crit)floatText(e.m.position,AR(amt),crit?"#f472b6":"#fde047");
+  if(amt>=25||crit||Math.random()<.2)floatText(e.m.position,AR(amt),crit?"#f472b6":"#fde047");
   if(e.hp<=0)kill(e);
 }
 function kill(e){
   e.dead=true;kills++;gold+=e.d.gold;goldEarned+=e.d.gold;
+  combo=(clockT-lastKill<2.2)?combo+1:1;lastKill=clockT;
+  if(combo>=6&&combo%6==0){const b=combo;gold+=b;goldEarned+=b;floatText(e.m.position,"🔥x"+combo+" +"+b,"#fb923c")}
+  if(e.d.splits){for(let i=0;i<2;i++){const c=spawnEnemy("mini");c.prog=Math.max(0,(e.prog||0)-.01*i);c.dist=e.dist;const p=curve.getPointAt(clamp(c.prog,0,1));c.m.position.set(p.x,0,p.z)}burst(e.m.position,0xf97316,12,5)}
   sfx(e.d.boss?"boom":"coin",e.d.boss?1:.5);
   burst(e.m.position,e.d.col,e.d.boss?30:10,e.d.boss?8:4);
-  if(e.d.boss){bossAlive=false;shake=Math.max(shake,1);bannerShow("💀 الزعيم مات! +"+AR(e.d.gold));sfx("win")}
+  if(e.d.boss){bossAlive=false;shake=Math.max(shake,1);slowmo=1.3;bannerShow("💀 الزعيم مات! +"+AR(e.d.gold));sfx("win")}
   scene.remove(e.m);scene.remove(e.hbG);
   hud();
 }
@@ -647,6 +716,7 @@ function updateEnemies(dt){
           burst(o.m.position,0x4ade80,2,2)}}}}
       // shield regen flavor
     }
+    if(e.pop>0){e.pop-=dt;e.m.scale.setScalar(1+Math.max(e.pop,0)*1.1)}else if(e.m.scale.x!=1)e.m.scale.setScalar(1);
     e.hbG.position.copy(e.m.position);e.hbG.position.y+=e.d.fly?3.0:2.3*e.d.scale+.5;
     e.hbG.quaternion.copy(cam.quaternion);
   }
@@ -702,6 +772,7 @@ function updateParts(dt){
 function updateTowers(dt){
   for(const tw of towers){
     fireTower(tw,dt);
+    if(tw.m.userData.ring){tw.m.userData.ring.rotation.z+=dt*2;tw.m.userData.ring.scale.setScalar(1+Math.sin(clockT*3)*.08)}
     if(tw.m.userData.orb){tw.m.userData.orb.rotation.y+=dt*3;tw.m.userData.orb.position.y+=Math.sin(clockT*3)*dt*.3}
   }
 }
@@ -714,6 +785,7 @@ function updateAmbient(dt){
     for(let i=0;i<pos.count;i++){const x=pos.getX(i);pos.setZ(i,Math.sin(clockT*6+x*4)*.08*(x+.5))}
     pos.needsUpdate=true}
   if(scene.userData.caveGlow)scene.userData.caveGlow.material.opacity=.35+Math.sin(clockT*2.5)*.2;
+  updateWeather(dt);
   if(msgT>0){msgT-=dt;if(msgT<=0)$("msg").style.opacity=0}
   // ability cooldown ticks refresh bar
   const hadCd=abMeteor.cd>0||abFreeze.cd>0;
@@ -732,7 +804,8 @@ function waveDoneCheck(){
 // ---------- game flow ----------
 function newGame(si){
   if(typeof si=="number")setStage(si);else setStage(stageIdx);
-  buildMap();
+  if(endless)WMAX=1e9;
+  buildMap();buildWeather();applyMeta();
   for(const e of enemies){scene.remove(e.m);scene.remove(e.hbG)}
   for(const t of towers)scene.remove(t.m);
   for(const s of shots)scene.remove(s.m);
@@ -740,10 +813,10 @@ function newGame(si){
   for(const f of floats)scene.remove(f.s);
   for(const c of cells)c.userData.taken=false;
   enemies=[];towers=[];shots=[];parts=[];floats=[];queue=[];
-  gold=ST.gold;lives=ST.lives;wave=0;kills=0;dmgDealt=0;goldEarned=0;inWave=false;state="play";speedMul=1;paused=false;bossAlive=false;
+  gold=ST.gold+40*(meta().lv.gold||0);lives=ST.lives+2*(meta().lv.hp||0);combo=0;slowmo=0;wave=0;kills=0;dmgDealt=0;goldEarned=0;inWave=false;state="play";speedMul=1;paused=false;bossAlive=false;
   abMeteor.cd=0;abFreeze.cd=0;buildType=null;closePop();
   $("end").classList.remove("on");$("start").classList.remove("on");$("pause").classList.remove("on");
-  hud();mkBar();say(ST.ic+" "+ST.n+" 🏰",2500);bannerShow("المرحلة "+AR(stageIdx+1)+": "+ST.n+" ، "+AR(WMAX)+" موجة",3200);
+  hud();mkBar();say(ST.ic+" "+ST.n+" 🏰",2500);bannerShow(endless?"♾ لانهائي: "+ST.n:"المرحلة "+AR(stageIdx+1)+": "+ST.n+" ، "+AR(WMAX)+" موجة"+(hard?" 🔥":""),3200);
 }
 function camp(){try{const c=JSON.parse(localStorage.getItem("cg3d_camp")||"null");if(c&&c.s)return c}catch(e){}return{u:0,s:[0,0,0,0,0]}}
 function saveCamp(c){try{localStorage.setItem("cg3d_camp",JSON.stringify(c))}catch(e){}}
@@ -754,7 +827,7 @@ function renderStages(){
     const b=document.createElement("button");const lock=i>c.u;
     b.className="sc"+(lock?" lock":"")+(i==Math.min(c.u,4)?" cur":"");
     b.innerHTML="<b>"+(lock?"🔒":S.ic)+"</b>"+AR(i+1)+"<small>"+(c.s[i]?"★".repeat(c.s[i])+"☆".repeat(3-c.s[i]):(lock?"":"☆☆☆"))+"</small>";
-    b.onclick=()=>{if(lock)return;audio();newGame(i)};
+    b.onclick=()=>{if(lock)return;audio();endless=false;newGame(i)};
     g.appendChild(b);
   });
   const t=c.s.reduce((a,b)=>a+b,0);
@@ -767,7 +840,7 @@ function gameOver(win){
   state="over";saveHs();
   const h=hs();
   let st=0,unlockedNext=false;
-  if(win){
+  if(win&&!endless){
     st=lives>=ST.lives*.75?3:lives>=ST.lives*.4?2:1;
     const c=camp();c.s[stageIdx]=Math.max(c.s[stageIdx]||0,st);
     if(stageIdx<4&&c.u<stageIdx+1){c.u=stageIdx+1;unlockedNext=true}
@@ -776,13 +849,21 @@ function gameOver(win){
   $("et").textContent=win?(stageIdx==4?"🏆 خلصت الحملة! حارس أسطوري":"🏆 المرحلة اتحلت!"):"💔 وقعت القلعة…";
   $("est").innerHTML="<div><b>"+AR(wave)+"</b>موجة</div><div><b>"+AR(kills)+"</b>قتلة</div><div><b>"+AR(dmgDealt)+"</b>ضرر</div><div><b>"+AR(goldEarned)+"</b>ذهب</div>";
   $("ep").innerHTML=win?("نجوم المرحلة: "+"★".repeat(st)+"☆".repeat(3-st)+(unlockedNext?"<br>🔓 اتفتحت المرحلة "+AR(stageIdx+2)+": "+STAGES[stageIdx+1].n:"")):("وصلت للموجة "+AR(wave)+" من "+AR(WMAX)+" في "+ST.n+".");
-  $("nxt").style.display=(win&&stageIdx<4)?"":"none";
+  {let gems=win?(5+stageIdx*3+st*2):Math.floor(wave/2);if(endless)gems=Math.floor(wave*1.2);if(hard)gems=Math.ceil(gems*1.5);
+   const m=meta();m.gems+=gems;saveMeta(m);$("ep").innerHTML+="<br>💎 +"+AR(gems)+" جوهرة"+(hard?" (صعب ×١.٥)":"");
+   if(endless){const b=+localStorage.getItem("cg3d_end")||0;if(wave>b){localStorage.setItem("cg3d_end",wave);$("ep").innerHTML+="<br>🏅 رقم قياسي جديد في اللانهائي!"}}}
+  $("nxt").style.display=(win&&stageIdx<4&&!endless)?"":"none";
   $("end").classList.add("on");
   sfx(win?"win":"lose");
 }
-$("go").onclick=()=>{audio();const c=camp();newGame(Math.min(c.u,4))};
+$("go").onclick=()=>{audio();endless=false;const c=camp();newGame(Math.min(c.u,4))};
+$("endlessb").onclick=()=>{audio();endless=true;const c=camp();newGame(Math.min(c.u,4))};
+function syncHard(){$("hardb").className="btn xs"+(hard?" on":"");$("hardb").textContent=hard?"🔥 صعب: شغال":"🔥 صعب"}
+$("hardb").onclick=()=>{hard=!hard;localStorage.setItem("cg3d_hard",hard?"1":"0");syncHard()};syncHard();
+$("shopb").onclick=()=>{renderShop();$("shop").classList.add("on")};
+$("shback").onclick=()=>$("shop").classList.remove("on");
 $("again").onclick=()=>{audio();newGame(stageIdx)};
-$("nxt").onclick=()=>{audio();newGame(Math.min(stageIdx+1,4))};
+$("nxt").onclick=()=>{audio();endless=false;newGame(Math.min(stageIdx+1,4))};
 $("tomenu").onclick=toMenu;$("pmenu").onclick=toMenu;
 $("resume").onclick=()=>{paused=false;$("pause").classList.remove("on")};
 // spawn scheduling within update
@@ -812,7 +893,8 @@ let acc=0;
 function loop(){
   requestAnimationFrame(loop);
   const raw=Math.min(clock.getDelta(),.1);
-  const dt=(state=="play"&&!paused)?raw*speedMul:0;
+  if(slowmo>0)slowmo-=raw;
+  const dt=(state=="play"&&!paused)?raw*speedMul*(slowmo>0?.35:1):0;
   if(dt>0){
     spawner(dt);
     updateEnemies(dt);
@@ -835,6 +917,7 @@ loop();
 buildMap();renderStages();
 {const h=hs();if(h.wave>0)$("hsline").textContent="🏅 أحسن نتيجة: موجة "+AR(h.wave)+" — ☠ "+AR(h.kills)}
 // debug/testing hook
+window.__endless=v=>{endless=v};window.__w=()=>({enemiesTypes:enemies.map(e=>e.t),weather:!!weather,meta:meta()});
 window.__win=()=>gameOver(true);
 window.__g=()=>({state,wave,lives,gold,kills,en:enemies.filter(e=>!e.dead).length,tw:towers.length,q:queue.length,inWave,parts:parts.length,shots:shots.length});
 window.__tap=(c,r)=>{const cell=cells.find(x=>x.userData.c==c&&x.userData.r==r);if(buildType){tryBuild(c,r);buildType=null;mkBar()}return !!cell};
@@ -848,3 +931,4 @@ window.__towers=()=>towers.map(t=>({type:t.type,lv:t.lv,c:t.c,r:t.r}));
 </script>
 </body>
 </html>
+
