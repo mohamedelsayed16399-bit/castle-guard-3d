@@ -705,12 +705,14 @@ function chainZap(from,e,dmg,chain){
     cur=best;
   }
 }
+function hitFlash(e){if(lowQ||e.d.boss)return;if(!e.fm){e.fm=[];e.m.traverse(c=>{if(c.isMesh&&c.material&&c.material.emissive){c.material=c.material.clone();e.fm.push({mt:c.material,c0:c.material.emissive.clone(),i0:c.material.emissiveIntensity})}})}e.fl=.1;for(const f of e.fm){f.mt.emissive.setHex(0xffffff);f.mt.emissiveIntensity=.9}window.__fl=(window.__fl||0)+1}
+function flashTick(e,dt){if(e.fl>0){e.fl-=dt;if(e.fl<=0){for(const f of e.fm){f.mt.emissive.copy(f.c0);f.mt.emissiveIntensity=f.i0}}}}
 function damage(e,amt,crit=false){
   if(e.dead)return;if(lastTw)e.by=lastTw;
   amt*=DMGM*perk.dmg;
   if(e.slowT>0)amt*=1.25;
   if(e.d.armor&&amt<22)amt*=.45;
-  e.pop=.12;
+  e.pop=.12;hitFlash(e);
   e.hp-=amt;dmgDealt+=amt;
   e.fg.scale.x=clamp(e.hp/e.max,0,1);e.fg.position.x=-(1-e.fg.scale.x)*.63;
   e.fg.material.color.setHex(e.hp/e.max>.5?0x22c55e:e.hp/e.max>.25?0xfacc15:0xef4444);
@@ -906,6 +908,7 @@ const tmpV=new V3();
 function updateEnemies(dt){
   for(const e of enemies){
     if(e.dead)continue;
+    flashTick(e,dt);
     {const sk=e.pois?1:e.slowT>0?2:e.stun>0?3:0;if(e.stk!==sk){e.stk=sk;e.stb.visible=sk>0;if(sk)e.stb.material.color.setHex(sk==1?0x34d399:sk==2?0x38bdf8:0xfacc15);window.__stk=sk}}
     if(e.pois){e.pois.t-=dt;e.pois.acc+=dt;if(e.pois.acc>=.5){e.pois.acc-=.5;burst(e.m.position,0x34d399,2,2);damage(e,e.pois.dps*.5);window.__pdmg=(window.__pdmg||0)+1;if(e.dead)continue}if(e.pois.t<=0)e.pois=null}
     if(e.delay>0){e.delay-=dt;e.m.visible=e.delay<=0;e.hbG.visible=e.m.visible;continue}
