@@ -81,7 +81,7 @@ canvas{display:block;position:fixed;inset:0;touch-action:none}
 @keyframes pl{to{box-shadow:0 0 30px #22d3ee}}
 #modb{position:fixed;top:92px;left:50%;transform:translateX(-50%);padding:6px 16px;border-radius:99px;font-weight:900;font-size:14px;background:#4c1d95dd;border:1px solid #c4b5fd88;z-index:2;display:none;pointer-events:none;white-space:nowrap}
 #heal{position:fixed;right:10px;bottom:178px;width:62px;height:62px;border-radius:50%;border:3px solid #4ade80;background:radial-gradient(circle,#15803d,#14532d);color:#fff;font-family:inherit;font-weight:900;font-size:11px;line-height:1.2;z-index:3;display:none;box-shadow:0 0 14px #4ade8088;cursor:pointer}
-#heal b{display:block;font-size:22px}
+#heal b{display:block;font-size:22px}#shld{position:fixed;right:10px;bottom:250px;width:62px;height:62px;border-radius:50%;border:3px solid #a78bfa;background:radial-gradient(circle,#6d28d9,#4c1d95);color:#fff;font-family:inherit;font-weight:900;font-size:11px;line-height:1.2;z-index:3;display:none;box-shadow:0 0 14px #a78bfa88;cursor:pointer}#shld b{display:block;font-size:22px}#shld.cd{filter:grayscale(.9);opacity:.6;box-shadow:none}
 #heal.cd{filter:grayscale(.9);opacity:.6;box-shadow:none}
 </style>
 </head>
@@ -97,7 +97,7 @@ canvas{display:block;position:fixed;inset:0;touch-action:none}
   <div id="wbar"><div id="wfill"></div></div>
   <div id="pv"></div>
 </div>
-<div id="msg"></div><div id="modb"></div><button id="heal"><b>💚</b>ترميم</button><button id="ult"><b>🌀</b>عاصفة</button>
+<div id="msg"></div><div id="modb"></div><button id="shld"><b>🛡</b>درع</button><button id="heal"><b>💚</b>ترميم</button><button id="ult"><b>🌀</b>عاصفة</button>
 <div id="banner"></div>
 <div id="pop"></div>
 <div id="bar"></div>
@@ -866,12 +866,15 @@ function ultimate(){
   for(const e of enemies){if(e.dead||e.delay>0||e.d.fly)continue;if(e.m.position.distanceTo(p)<=R){damage(e,dm);if(!e.d.boss)e.stun=Math.max(e.stun,1.2);else e.stun=Math.max(e.stun,.4)}}
   bannerShow("🌀 عاصفة البطل!",1500);hud();
 }
+let shieldN=0,shCd=0;
+function shieldCast(){if(state!="play"||paused||shCd>0)return;shCd=70;shieldN=3;sfx("win");if(hero){burst(hero.position,0xa78bfa,24,8)}bannerShow("🛡 درع القلعة: بيمنع ٣ تسريبات",1800);window.__shn=shieldN}
+$("shld").onclick=shieldCast;window.__shield=shieldCast;
 function healCast(){if(state!="play"||paused||healCd>0)return;healCd=45;lives+=3;sfx("win");
   if(hero){const rg=new THREE.Mesh(new THREE.RingGeometry(.3,.9,32),new THREE.MeshBasicMaterial({color:0x4ade80,side:2,transparent:true,opacity:.9,depthWrite:false}));rg.rotation.x=-Math.PI/2;rg.position.set(hero.position.x,.2,hero.position.z);scene.add(rg);parts.push({m:rg,v:null,l:.6,tl:.6,ring:3});burst(hero.position,0x4ade80,16,7)}
   bannerShow("💚 ترميم الأسوار +٣ ❤️",1600);hud()}
 $("heal").onclick=healCast;
 $("ult").onclick=ultimate;
-function updateUlt(dt){healCd=Math.max(0,healCd-dt);{const h=$("heal");h.style.display=state=="play"?"block":"none";if(healCd>0){h.className="cd";h.innerHTML="<b>"+AR(Math.ceil(healCd))+"</b>ث"}else{h.className="";h.innerHTML="<b>💚</b>ترميم"}}ultCd=Math.max(0,ultCd-dt);const b=$("ult");b.style.display=state=="play"?"block":"none";
+function updateUlt(dt){shCd=Math.max(0,shCd-dt);{const h=$("shld");h.style.display=state=="play"?"block":"none";if(shCd>0){h.className="cd";h.innerHTML="<b>"+AR(Math.ceil(shCd))+"</b>ث"}else if(shieldN>0){h.className="";h.innerHTML="<b>🛡"+AR(shieldN)+"</b>شغال"}else{h.className="";h.innerHTML="<b>🛡</b>درع"}}healCd=Math.max(0,healCd-dt);{const h=$("heal");h.style.display=state=="play"?"block":"none";if(healCd>0){h.className="cd";h.innerHTML="<b>"+AR(Math.ceil(healCd))+"</b>ث"}else{h.className="";h.innerHTML="<b>💚</b>ترميم"}}ultCd=Math.max(0,ultCd-dt);const b=$("ult");b.style.display=state=="play"?"block":"none";
   if(ultCd>0){b.className="cd";b.innerHTML="<b>"+AR(Math.ceil(ultCd))+"</b>ث"}else{b.className="rdy";b.innerHTML="<b>🌀</b>عاصفة"}}
 function updateHero(dt){
   if(!hero)return;
@@ -933,7 +936,7 @@ function updateEnemies(dt){
       e.prog=(e.prog||0)+sp*dt/PATHLEN;
       if(e.slowT>0)e.slowT-=dt;
       if(e.prog>=1){ // leaked
-        e.dead=true;lives-=e.d.dmg;scene.remove(e.m);scene.remove(e.hbG);
+        e.dead=true;if(shieldN>0){shieldN--;window.__shn=shieldN;bannerShow("🛡 الدرع صدّ التسريب! باقي "+AR(shieldN),1200)}else lives-=e.d.dmg;scene.remove(e.m);scene.remove(e.hbG);
         sfx("leak");shake=Math.max(shake,.6);leakFlash();
         $("vign").classList.add("hurt");setTimeout(()=>$("vign").classList.remove("hurt"),300);
         say(e.d.boss?"الزعيم دخل القلعة!! 😱":"-"+AR(e.d.dmg)+" ❤️",900);
@@ -1091,7 +1094,7 @@ function newGame(si){
   for(const f of floats)scene.remove(f.s);
   for(const c of cells)c.userData.taken=false;
   enemies=[];towers=[];shots=[];parts=[];floats=[];queue=[];
-  window.__t0=performance.now();gold=ST.gold+40*(meta().lv.gold||0);lives=ST.lives+2*(meta().lv.hp||0);combo=0;comboN=0;comboBest=0;waveG=[];undoTw=null;$("undob").style.display="none";$("lowfx").style.display="none";perfS=0;duskT=0;duskC=0;slowmo=0;wave=0;kills=0;dmgDealt=0;goldEarned=0;inWave=false;state="play";speedMul=1;paused=false;bossAlive=false;
+  window.__t0=performance.now();shieldN=0;shCd=0;gold=ST.gold+40*(meta().lv.gold||0);lives=ST.lives+2*(meta().lv.hp||0);combo=0;comboN=0;comboBest=0;waveG=[];undoTw=null;$("undob").style.display="none";$("lowfx").style.display="none";perfS=0;duskT=0;duskC=0;slowmo=0;wave=0;kills=0;dmgDealt=0;goldEarned=0;inWave=false;state="play";speedMul=1;paused=false;bossAlive=false;
   abMeteor.cd=0;abFreeze.cd=0;buildType=null;closePop();for(const k of chests)scene.remove(k.m);chests=[];for(const h of hzWarn){scene.remove(h.rg);scene.remove(h.fl)}hzWarn=[];bliz=0;hzT=18;perk={dmg:1,range:1,rate:1,gold:1,hero:1,got:[]};heroXp=0;heroLv=1;mod=null;ultCd=6;healCd=20;$("modb").style.display="none";perkOpen=false;$("perk").classList.remove("on");spawnHero();if(!heroHint){heroHint=true;setTimeout(()=>bannerShow("🛡 البطل: دوس على أي مكان فاضي عشان تحرّكه",4200),3400)}
   $("end").classList.remove("on");$("start").classList.remove("on");$("pause").classList.remove("on");
   hud();mkBar();say(ST.ic+" "+ST.n+" 🏰",2500);
