@@ -122,7 +122,7 @@ canvas{display:block;position:fixed;inset:0;touch-action:none}
 <div class="ov" id="shop"><h1>💎 تحسينات دائمة</h1><p id="gemline"></p><div id="shl" style="display:flex;flex-direction:column;gap:8px"></div><button class="btn sm" id="shback">رجوع</button></div>
 <div class="ov" id="ach"><h1>🏅 الإنجازات</h1><div id="achl"></div><p id="achs"></p><button class="btn sm" id="achx">رجوع</button></div><button id="undob" style="position:fixed;left:50%;bottom:150px;transform:translateX(-50%);z-index:40;display:none;background:#b45309;color:#fff;border:2px solid #fde68a;border-radius:24px;padding:10px 20px;font:800 15px system-ui;direction:rtl"></button><div id="wsplash" style="position:fixed;left:0;right:0;top:34%;z-index:27;pointer-events:none;text-align:center;font:900 64px system-ui;color:#fff;text-shadow:0 4px 14px #000,0 0 24px #f59e0b;opacity:0;direction:rtl"></div><style>@keyframes lowp{0%,100%{opacity:.15}50%{opacity:.85}}#lowfx{position:fixed;inset:0;z-index:26;pointer-events:none;display:none;box-shadow:inset 0 0 70px 14px rgba(220,38,38,.65);animation:lowp 1.1s ease-in-out infinite}</style><div id="lowfx"></div><div id="leakfx" style="position:fixed;inset:0;z-index:28;pointer-events:none;opacity:0;transition:opacity .45s;box-shadow:inset 0 0 90px 24px rgba(239,68,68,.75)"></div><div id="bbar" style="position:fixed;top:128px;left:50%;transform:translateX(-50%);width:72%;max-width:340px;z-index:29;pointer-events:none;display:none;direction:rtl;text-align:center;font:800 13px system-ui;color:#fff;text-shadow:0 1px 4px #000"><div id="bbn"></div><div style="height:12px;border-radius:7px;background:#0008;border:2px solid #000;overflow:hidden;margin-top:2px"><div id="bbf" style="height:100%;width:100%;background:linear-gradient(90deg,#ef4444,#f97316);transition:width .15s"></div></div></div><div id="combo" style="position:fixed;top:92px;right:10px;z-index:30;pointer-events:none;font:900 22px system-ui;color:#fde047;text-shadow:0 2px 6px #000,0 0 12px #f97316;opacity:0;transition:opacity .2s,transform .15s;direction:rtl;text-align:right"></div><div class="atoast" id="atoast"></div>
 <div class="ov" id="perk"><h1>🎁 اختار ميزة</h1><p>الميزة دي لحد آخر المرحلة</p><div id="perkb" style="display:flex;flex-direction:column;gap:10px"></div><p id="perkl"></p></div>
-<div class="ov" id="pause"><h1>⏸ وقفة</h1><div class="opt"><button class="btn xs" id="autob">⏭ موجة أوتو: مقفول</button><button class="btn xs" id="musb">🎵 موسيقى</button><button class="btn xs" id="qualb">🎨 جودة: عالية</button></div><button class="btn" id="resume">كمّل</button><button class="btn sm" id="pmenu">كل المراحل</button></div>
+<div class="ov" id="pause"><h1>⏸ وقفة</h1><div class="opt"><button class="btn xs" id="autob">⏭ موجة أوتو: مقفول</button><button class="btn xs" id="musb">🎵 موسيقى</button><button class="btn xs" id="qualb">🎨 جودة: عالية</button></div><div id="legend" style="display:flex;flex-wrap:wrap;gap:4px;justify-content:center;max-width:360px;max-height:150px;overflow:auto;font-size:11px;margin:6px 0"></div><button class="btn" id="resume">كمّل</button><button class="btn sm" id="pmenu">كل المراحل</button></div>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
 <script type="module">
 import * as THREE from "three";
@@ -538,6 +538,7 @@ function hs(){return JSON.parse(localStorage.getItem("cg3d_hs")||'{"wave":0,"kil
 function saveHs(){const h=hs();if(wave>h.wave||(wave==h.wave&&kills>h.kills))localStorage.setItem("cg3d_hs",JSON.stringify({wave,kills}))}
 // ---------- bottom bar ----------
 function cdLeft(a){return Math.max(0,a.cd)}
+function fillLegend(){const L=$("legend");if(!L)return;let h="";for(const k in EN){if(k=="mini")continue;const d=EN[k];h+='<span style="background:#ffffff14;border-radius:8px;padding:3px 6px;white-space:nowrap">'+(EMO[k]||"❓")+" "+d.name+" ❤"+AR(d.hp)+(d.fly?" ✈":"")+(d.boss?" 👑":"")+"</span>"}L.innerHTML=h;window.__leg=L.children.length}
 function mkBar(){
   const b=$("bar");b.innerHTML="";
   for(const k in TW){const t=TW[k];
@@ -564,7 +565,7 @@ function mkBar(){
   s.innerHTML="<b>"+(speedMul>=3?"⏩":speedMul==2?"▶▶":"▶")+"</b>×"+AR(speedMul);
   s.onclick=()=>{speedMul=speedMul==1?2:speedMul==2?3:1;mkBar()};b.appendChild(s);
   const p=document.createElement("button");p.className="tb";p.style.flex=".45";p.innerHTML="<b>⏸</b>";
-  p.onclick=()=>{if(state=="play"){paused=true;$("pause").classList.add("on")}};b.appendChild(p);
+  p.onclick=()=>{if(state=="play"){paused=true;fillLegend();$("pause").classList.add("on")}};b.appendChild(p);
   const mu=document.createElement("button");mu.className="tb";mu.style.flex=".45";mu.innerHTML="<b>"+(muted?"🔇":"🔊")+"</b>";
   mu.onclick=()=>{muted=!muted;mkBar()};b.appendChild(mu);
 }
