@@ -537,7 +537,7 @@ function comboTick(dt){lastTw=null;duskTick(dt);if(comboN>0){comboT-=dt;if(combo
 function bannerShow(t,ms=2600){const b=$("banner");b.textContent=t;b.classList.add("on");clearTimeout(b._t);b._t=setTimeout(()=>b.classList.remove("on"),ms)}
 function say(t,ms=1800){const m=$("msg");m.textContent=t;m.style.opacity=1;msgT=ms/1000}
 function hud(){
-  $("hp").textContent="❤️ "+AR(lives);
+  $("hp").textContent="❤️ "+AR(lives)+(shieldN>0?" 🛡"+AR(shieldN):"");
   $("wv").textContent="🌊 "+AR(Math.max(wave,1))+(endless?" ♾":"/"+AR(WMAX));
   $("kl").textContent="☠ "+AR(kills);
   $("gold").textContent="💰 "+AR(gold);
@@ -866,8 +866,8 @@ function ultimate(){
   for(const e of enemies){if(e.dead||e.delay>0||e.d.fly)continue;if(e.m.position.distanceTo(p)<=R){damage(e,dm);if(!e.d.boss)e.stun=Math.max(e.stun,1.2);else e.stun=Math.max(e.stun,.4)}}
   bannerShow("🌀 عاصفة البطل!",1500);hud();
 }
-let shieldN=0,shCd=0;
-function shieldCast(){if(state!="play"||paused||shCd>0)return;shCd=70;shieldN=3;sfx("win");if(hero){burst(hero.position,0xa78bfa,24,8)}bannerShow("🛡 درع القلعة: بيمنع ٣ تسريبات",1800);window.__shn=shieldN}
+var shieldN=0;let shCd=0;window.__leak=()=>{const e=enemies.find(x=>!x.dead&&x.delay<=0);if(e)e.prog=1;return !!e};
+function shieldCast(){if(state!="play"||paused||shCd>0)return;shCd=70;shieldN=3;sfx("win");if(hero){burst(hero.position,0xa78bfa,24,8)}bannerShow("🛡 درع القلعة: بيمنع ٣ تسريبات",1800);window.__shn=shieldN;hud()}
 $("shld").onclick=shieldCast;window.__shield=shieldCast;
 function healCast(){if(state!="play"||paused||healCd>0)return;healCd=45;lives+=3;sfx("win");
   if(hero){const rg=new THREE.Mesh(new THREE.RingGeometry(.3,.9,32),new THREE.MeshBasicMaterial({color:0x4ade80,side:2,transparent:true,opacity:.9,depthWrite:false}));rg.rotation.x=-Math.PI/2;rg.position.set(hero.position.x,.2,hero.position.z);scene.add(rg);parts.push({m:rg,v:null,l:.6,tl:.6,ring:3});burst(hero.position,0x4ade80,16,7)}
