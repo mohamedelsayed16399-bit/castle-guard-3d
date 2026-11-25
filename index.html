@@ -1070,13 +1070,14 @@ function newGame(si){
 }
 function camp(){try{const c=JSON.parse(localStorage.getItem("cg3d_camp")||"null");if(c&&c.s){while(c.s.length<STAGES.length)c.s.push(0);if(c.s[4]>0&&c.u<5)c.u=5;return c}}catch(e){}return{u:0,s:[0,0,0,0,0,0]}}
 function saveCamp(c){try{localStorage.setItem("cg3d_camp",JSON.stringify(c))}catch(e){}}
+function bwGet(){try{return JSON.parse(localStorage.getItem("cg3d_bw")||"{}")}catch(e){return{}}}
 function stars(){return"⭐".repeat(0)}
 function renderStages(){
   const c=camp(),g=$("sg");g.innerHTML="";
   STAGES.forEach((S,i)=>{
     const b=document.createElement("button");const lock=i>c.u;
     b.className="sc"+(lock?" lock":"")+(i==Math.min(c.u,STAGES.length-1)?" cur":"");
-    b.innerHTML="<b>"+(lock?"🔒":S.ic)+"</b>"+AR(i+1)+"<small>"+(c.s[i]?"★".repeat(c.s[i])+"☆".repeat(3-c.s[i]):(lock?"":"☆☆☆"))+"</small>";
+    b.innerHTML="<b>"+(lock?"🔒":S.ic)+"</b>"+AR(i+1)+"<small>"+(c.s[i]?"★".repeat(c.s[i])+"☆".repeat(3-c.s[i]):(lock?"":"☆☆☆"))+"</small>"+(bwGet()[i]&&!lock?"<small style=\"opacity:.8\">🌊"+AR(bwGet()[i])+"</small>":"");
     b.onclick=()=>{if(lock)return;audio();endless=false;newGame(i)};
     g.appendChild(b);
   });
@@ -1087,7 +1088,7 @@ function renderStages(){
 }
 function toMenu(){state="menu";$("heal").style.display="none";$("ult").style.display="none";$("modb").style.display="none";paused=false;perkOpen=false;$("perk").classList.remove("on");$("end").classList.remove("on");$("pause").classList.remove("on");renderStages();$("start").classList.add("on")}
 function gameOver(win){
-  state="over";$("heal").style.display="none";$("ult").style.display="none";$("modb").style.display="none";saveHs();XST.runs++;XST.kills+=0;
+  state="over";$("heal").style.display="none";$("ult").style.display="none";$("modb").style.display="none";saveHs();XST.runs++;if(!endless){try{const b=bwGet();b[stageIdx]=Math.max(b[stageIdx]||0,win?WMAX:wave);localStorage.setItem("cg3d_bw",JSON.stringify(b))}catch(e){}}XST.kills+=0;
   if(win&&!endless){XST.wins++;if(hard)XST.hardwin++;if(stageIdx==STAGES.length-1)XST.camp=true}
   if(endless)XST.endw=Math.max(XST.endw,wave);
   const h=hs();
@@ -1195,7 +1196,7 @@ buildMap();renderStages();
 document.addEventListener("visibilitychange",()=>{if(document.hidden&&state=="play"&&!paused&&!perkOpen){paused=true;$("pause").classList.add("on")}});
 addEventListener("keydown",e=>{if(e.key=="Escape"||e.key=="p"||e.key=="P"){if(state=="play"&&!perkOpen){paused=!paused;$("pause").classList.toggle("on",paused)}}});
 window.__endless=v=>{endless=v};window.__w=()=>({enemiesTypes:enemies.map(e=>e.t),weather:!!weather,meta:meta()});
-window.__win=()=>gameOver(true);window.__cs=()=>({XST,XAH,chkAch,showAch});
+window.__win=()=>gameOver(true);window.__lose=()=>gameOver(false);window.__rs=()=>{renderStages();return document.querySelector("#sg .sc").innerText};window.__cs=()=>({XST,XAH,chkAch,showAch});
 window.__g=()=>({state,wave,lives,gold,kills,en:enemies.filter(e=>!e.dead).length,tw:towers.length,q:queue.length,inWave,parts:parts.length,shots:shots.length});
 window.__tap=(c,r)=>{const cell=cells.find(x=>x.userData.c==c&&x.userData.r==r);if(buildType){tryBuild(c,r);buildType=null;mkBar()}return !!cell};
 window.__setBuild=k=>{buildType=k};
