@@ -575,6 +575,8 @@ function freezeAll(){abFreeze.cd=abFreeze.max;sfx("freeze");
   for(const e of enemies){if(!e.dead){e.stun=Math.max(e.stun,4);burst(e.m.position,0x7dd3fc,6)}}
   bannerShow("❄ تجميد شامل!");mkBar();
 }
+function ringFx(p,col){const m=new THREE.Mesh(new THREE.RingGeometry(.35,.55,28),new THREE.MeshBasicMaterial({color:col,transparent:true,opacity:.9,side:THREE.DoubleSide,depthWrite:false}));m.rotation.x=-Math.PI/2;m.position.copy(p);m.position.y=.32;scene.add(m);let t=0;window.__rings=(window.__rings||0)+1;
+ (function st(){t+=.03;m.scale.setScalar(1+t*9);m.material.opacity=Math.max(0,.9-t*1.8);if(t<.5)requestAnimationFrame(st);else{scene.remove(m);m.geometry.dispose();m.material.dispose()}})()}
 function tryBuild(c,r){
   const cell=cells.find(x=>x.userData.c==c&&x.userData.r==r);
   if(!cell||cell.userData.path||cell.userData.taken)return false;
@@ -583,7 +585,7 @@ function tryBuild(c,r){
   const m=towerModel(buildType,1);const p=cellPos(c,r);m.position.copy(p);m.userData.grow=0;m.scale.setScalar(.05);scene.add(m);
   towers.push({type:buildType,lv:1,m,c,r,cd:0,mode:"first",sellVal:Math.round(t.lv[0].cost*.7),spent:t.lv[0].cost});
   cell.userData.taken=true;
-  burst(p,0xffffff,8);hud();mkBar();return true;
+  burst(p,0xffffff,8);ringFx(p,0x93c5fd);hud();mkBar();return true;
 }
 // ---------- input ----------
 const ray=new THREE.Raycaster(),ptr=new THREE.Vector2();
