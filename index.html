@@ -461,8 +461,8 @@ function spawnEnemy(t,delay=0){
   const hbG=new THREE.Group();
   const bg=new THREE.Mesh(new THREE.PlaneGeometry(1.3,.14),new THREE.MeshBasicMaterial({color:0x111827cc,depthWrite:false}));
   const fg=new THREE.Mesh(new THREE.PlaneGeometry(1.26,.1),new THREE.MeshBasicMaterial({color:0x22c55e,depthWrite:false}));
-  fg.position.z=.001;hbG.add(bg,fg);scene.add(hbG);
-  const e={m,mx:m.userData.mixer,hbG,fg,t,hp:hpm,max:hpm,spd:d.spd,dist:0,slow:0,slowT:0,stun:0,d,delay,delayT:delay,bob:Math.random()*6,healT:0,dead:false};
+  fg.position.z=.001;const stb=new THREE.Mesh(new THREE.PlaneGeometry(1.3,.07),new THREE.MeshBasicMaterial({color:0x38bdf8,depthWrite:false}));stb.position.set(0,-.12,.001);stb.visible=false;hbG.add(bg,fg,stb);scene.add(hbG);
+  const e={m,mx:m.userData.mixer,hbG,fg,stb,t,hp:hpm,max:hpm,spd:d.spd,dist:0,slow:0,slowT:0,stun:0,d,delay,delayT:delay,bob:Math.random()*6,healT:0,dead:false};
   enemies.push(e);
   if(d.boss){bossAlive=true;sfx("boss");bannerShow("⚠ "+d.name+" قادم!");bossWarn();shake=Math.max(shake,.5)}
   return e;
@@ -903,6 +903,7 @@ const tmpV=new V3();
 function updateEnemies(dt){
   for(const e of enemies){
     if(e.dead)continue;
+    {const sk=e.pois?1:e.slowT>0?2:e.stun>0?3:0;if(e.stk!==sk){e.stk=sk;e.stb.visible=sk>0;if(sk)e.stb.material.color.setHex(sk==1?0x34d399:sk==2?0x38bdf8:0xfacc15);window.__stk=sk}}
     if(e.pois){e.pois.t-=dt;e.pois.acc+=dt;if(e.pois.acc>=.5){e.pois.acc-=.5;burst(e.m.position,0x34d399,2,2);damage(e,e.pois.dps*.5);window.__pdmg=(window.__pdmg||0)+1;if(e.dead)continue}if(e.pois.t<=0)e.pois=null}
     if(e.delay>0){e.delay-=dt;e.m.visible=e.delay<=0;e.hbG.visible=e.m.visible;continue}
     if(e.mx)e.mx.update(e.stun>0?0:dt*(e.slowT>0?1-e.slow:1));
