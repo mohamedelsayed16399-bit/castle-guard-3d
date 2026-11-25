@@ -47,7 +47,7 @@ canvas{display:block;position:fixed;inset:0;touch-action:none}
 .hs{color:#38bdf8;font-weight:800}
 #vign{position:fixed;inset:0;pointer-events:none;z-index:1;box-shadow:inset 0 0 140px #0009;transition:box-shadow .3s}
 #vign.hurt{box-shadow:inset 0 0 140px #dc2626cc}
-.sg{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;width:min(94vw,470px)}
+.sg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:min(94vw,470px)}
 .sc{background:linear-gradient(180deg,#1c2b42,#111b2b);border:2px solid #ffffff22;border-radius:16px;color:#fff;font-family:inherit;padding:10px 2px 8px;font-size:12px;font-weight:800;line-height:1.5;cursor:pointer}
 .sc b{display:block;font-size:26px}
 .sc small{display:block;font-size:11px;color:#facc15;letter-spacing:1px;min-height:16px}
@@ -100,7 +100,7 @@ canvas{display:block;position:fixed;inset:0;touch-action:none}
 <div class="ov on" id="load" style="z-index:9"><h1>🏰</h1><p id="ltxt">جاري تحميل المجسمات ثلاثية الأبعاد…</p></div>
 <div class="ov on" id="start">
   <h1>🏰 حارس القلعة</h1>
-  <p>حملة من ٥ مراحل، كل واحدة أصعب من اللي قبلها: ٦ أنواع أبراج × ٤ مستويات، بطل فارس بتحركه بإيدك وعاصفة خاصة بيه، ميزات كل ٥ موجات، تحديات عشوائية في الموجات، أشباح بتنتقل، زعيم بينادي جنود، وبطل بيكبر بالمستويات، أعداء جداد، زعماء، وقدرتين خاصتين (☄ نيزك و ❄ تجميد). النجوم والمراحل اللي فتحتها بتتحفظ على موبايلك.<br>دوس على أرض خضرا عشان تبني، وبعدين ابدأ الموجة.</p>
+  <p>حملة من ٦ مراحل، ٦ أبراج، بطل فارس بتحركه، ميزات كل ٥ موجات، تحديات عشوائية، وتحالف بين الأبراج. دوس على أرض خضرا وابني!</p>
   <div class="sg" id="sg"></div>
   <div id="stn"></div>
   <p class="hs" id="hsline"></p>
@@ -178,7 +178,8 @@ const STAGES=[
  {n:"الغابة",ic:"🌲",path:[[0,1],[7,1],[7,4],[1,4],[1,7],[7,7],[7,10],[1,10],[1,12],[8,12]],waves:12,hp:1,gold:230,lives:20,theme:{ground:0x3f7a3a,fog:0x7aa7a0,g1:0x3f8a46,g2:0x37773d,road:0x7a6544,road2:0xa88a58,tuft:0x2c6a30}},
  {n:"الصحرا",ic:"🏜️",path:[[0,1],[4,1],[4,3],[8,3],[8,5],[0,5],[0,7],[8,7],[8,9],[2,9],[2,12],[8,12]],waves:15,hp:1.2,gold:220,lives:20,theme:{ground:0xc9a35e,fog:0xe8c98f,g1:0xd8b46c,g2:0xcca65e,road:0x9b7a45,road2:0xb89558,tuft:0x9a8a3a}},
  {n:"قمة التلج",ic:"❄️",path:[[0,1],[6,1],[6,3],[2,3],[2,5],[6,5],[6,7],[2,7],[2,9],[6,9],[6,11],[8,11],[8,12]],waves:15,hp:1.45,gold:210,lives:18,theme:{ground:0xdfe9f2,fog:0xbcd2e6,g1:0xe6eef6,g2:0xdde8f2,road:0x7c6a55,road2:0xa9b3c2,tuft:0xaec4d8}},
- {n:"جبل النار",ic:"🌋",path:[[0,1],[8,1],[8,3],[0,3],[0,5],[8,5],[8,7],[0,7],[0,9],[8,9],[8,12]],waves:18,hp:1.9,gold:240,lives:15,theme:{ground:0x3a2a2a,fog:0x6b3a2e,g1:0x5a3a34,g2:0x4d3029,road:0x2a1d1a,road2:0x5a3a2a,tuft:0xb0451f}}
+ {n:"جبل النار",ic:"🌋",path:[[0,1],[8,1],[8,3],[0,3],[0,5],[8,5],[8,7],[0,7],[0,9],[8,9],[8,12]],waves:18,hp:1.9,gold:240,lives:15,theme:{ground:0x3a2a2a,fog:0x6b3a2e,g1:0x5a3a34,g2:0x4d3029,road:0x2a1d1a,road2:0x5a3a2a,tuft:0xb0451f}},
+ {n:"المدينة المسحورة",ic:"🔮",path:[[0,1],[8,1],[8,3],[1,3],[1,5],[7,5],[7,7],[2,7],[2,9],[6,9],[6,11],[8,11],[8,12]],waves:20,hp:2.3,gold:250,lives:12,theme:{ground:0x2a2144,fog:0x3b2a63,g1:0x4b3a78,g2:0x40316b,road:0x4a3a78,road2:0x8f7cc4,tuft:0x8b5cf6}}
 ];
 let ST=STAGES[0],stageIdx=0,WMAX=10;
 let PATH,pathCells,curve,PATHLEN;
@@ -375,7 +376,7 @@ let gold,lives,wave,kills,dmgDealt,goldEarned,state="menu",enemies=[],towers=[],
 let heroXp=0,heroLv=1,mod=null,ultCd=0,ultMax=22,hero=null,heroTarget=null,heroCd=0,heroRing=null,perk={dmg:1,range:1,rate:1,gold:1,hero:1,got:[]},perkOpen=false,autoWave=localStorage.getItem("cg3d_auto")=="1",lowQ=localStorage.getItem("cg3d_lowq")=="1",heroHint=false;
 let abMeteor={cd:0,max:26},abFreeze={cd:0,max:32};
 const V3=THREE.Vector3;
-const ACHS=[["k100","حارس","اقتل 100 عدو",x=>x.kills>=100],["k1000","مدافع شرس","اقتل 1000 عدو",x=>x.kills>=1000],["k5000","جحيم الأسوار","اقتل 5000 عدو",x=>x.kills>=5000],["w1","أول نصر","اكسب مرحلة",x=>x.wins>=1],["w5","صدّ الهجمات","اكسب 5 مرات",x=>x.wins>=5],["camp","أسطورة","خلّص الحملة",x=>x.camp],["s3","نجوم","3 نجوم في مرحلة",x=>x.star3>=1],["s15","جامع النجوم","10 نجوم إجمالي",x=>x.stars>=10],["e15","صمود","موجة 15 في اللانهائي",x=>x.endw>=15],["e30","لا ينكسر","موجة 30 في اللانهائي",x=>x.endw>=30],["hd","شجاع","اكسب في الصعب",x=>x.hardwin>=1],["r10","مثابر","10 جولات",x=>x.runs>=10]];
+const ACHS=[["k100","حارس","اقتل 100 عدو",x=>x.kills>=100],["k1000","مدافع شرس","اقتل 1000 عدو",x=>x.kills>=1000],["k5000","جحيم الأسوار","اقتل 5000 عدو",x=>x.kills>=5000],["w1","أول نصر","اكسب مرحلة",x=>x.wins>=1],["w5","صدّ الهجمات","اكسب 5 مرات",x=>x.wins>=5],["camp","أسطورة","خلّص الحملة",x=>x.camp],["s3","نجوم","3 نجوم في مرحلة",x=>x.star3>=1],["s15","جامع النجوم","10 نجوم إجمالي",x=>x.stars>=10],["e15","صمود","موجة 15 في اللانهائي",x=>x.endw>=15],["e30","لا ينكسر","موجة 30 في اللانهائي",x=>x.endw>=30],["hd","شجاع","اكسب في الصعب",x=>x.hardwin>=1],["r10","مثابر","10 جولات",x=>x.runs>=10],["st6","المدينة المسحورة","اكسب المرحلة ٦",x=>x.camp]];
 let XST={kills:0,wins:0,runs:0,camp:false,star3:0,stars:0,endw:0,hardwin:0},XAH={};
 try{XST=Object.assign(XST,JSON.parse(localStorage.getItem("cg3d_stats")))}catch(e){}
 try{XAH=JSON.parse(localStorage.getItem("cg3d_ach"))||{}}catch(e){}
@@ -407,7 +408,7 @@ function buildWeather(){
   if(weather){scene.remove(weather);weather.geometry.dispose();weather=null}
   const N=420,pos=new Float32Array(N*3),spd=[];
   for(let i=0;i<N;i++){pos[i*3]=(Math.random()-.5)*46;pos[i*3+1]=Math.random()*22;pos[i*3+2]=(Math.random()-.5)*52;spd.push(.4+Math.random())}
-  const cfgW=[{c:0xfff3a0,sz:.12,vy:-.15,up:false},{c:0x8bd36a,sz:.22,vy:-1.1,up:false},{c:0xe8c98f,sz:.1,vy:-.2,up:false,wind:3},{c:0xffffff,sz:.2,vy:-2,up:false},{c:0xff7a1a,sz:.16,vy:2.2,up:true}][stageIdx]||{c:0xffffff,sz:.1,vy:-.2};
+  const cfgW=[{c:0xfff3a0,sz:.12,vy:-.15,up:false},{c:0x8bd36a,sz:.22,vy:-1.1,up:false},{c:0xe8c98f,sz:.1,vy:-.2,up:false,wind:3},{c:0xffffff,sz:.2,vy:-2,up:false},{c:0xff7a1a,sz:.16,vy:2.2,up:true},{c:0xc4b5fd,sz:.17,vy:-.35,up:false}][stageIdx]||{c:0xffffff,sz:.1,vy:-.2};
   const g=new THREE.BufferGeometry();g.setAttribute("position",new THREE.BufferAttribute(pos,3));
   weather=new THREE.Points(g,new THREE.PointsMaterial({color:cfgW.c,size:cfgW.sz,transparent:true,opacity:.85,depthWrite:false,sizeAttenuation:true}));
   weather.userData={spd,cfg:cfgW};weather.frustumCulled=false;scene.add(weather);
@@ -524,7 +525,7 @@ function openPop(tw){
   const t=TW[tw.type],lv=tw.lv,cur=t.lv[lv-1],nxt=lv<4?t.lv[lv]:null;
   const p=$("pop");
   const up=nxt?'<button class="up" id="pup">⬆ ترقية '+AR(nxt.cost)+'</button>':"";
-  p.innerHTML='<div class="pi">'+t.ic+" "+t.n+"<br>مستوى "+AR(lv)+(lv==4?" (ماكس)":"")+"<br>ضرر "+AR(cur.dmg)+" • مدى "+AR(cur.range)+"</div>"
+  p.innerHTML='<div class="pi">'+t.ic+" "+t.n+"<br>مستوى "+AR(lv)+(lv==4?" (ماكس)":"")+"<br>ضرر "+AR(cur.dmg)+" • مدى "+AR(cur.range)+(()=>{const y=synergy(tw);return y.n?"<br>🤝 تحالف +"+AR(Math.round((y.m-1)*100))+"٪":"<br><small>🤝 حطه جنب أبراج مختلفة +٨٪ لكل نوع</small>"})()+"</div>"
     +up
     +'<button id="ptg">🎯 '+TMN[tw.mode]+'</button>'
     +'<button class="sell" id="psl">💰 بيع '+AR(tw.sellVal)+'</button>';
@@ -683,6 +684,7 @@ function explodeAt(p,radius,dmg){
   hud();
 }
 // tower firing
+function synergy(tw){const ty=new Set();for(const o of towers){if(o===tw||o.type==tw.type)continue;if(o.m.position.distanceTo(tw.m.position)<3.4)ty.add(o.type)}return{n:ty.size,m:1+.08*Math.min(ty.size,4)}}
 function fireTower(tw,dt){
   const t=TW[tw.type],cur=t.lv[tw.lv-1];
   tw.cd-=dt;if(tw.cd>0)return;
@@ -701,17 +703,18 @@ function fireTower(tw,dt){
   }
   if(!best){tw.cd=.08;return}
   tw.cd=1/(cur.rate*perk.rate);
+  const SM=synergy(tw).m;
   const from=tw.m.position.clone();from.y+=1.4;
   // aim barrel
   const br=tw.m.userData.barrel;
   if(br){const dir=best.m.position.clone().sub(tw.m.position);tw.m.rotation.y=Math.atan2(dir.x,dir.z)}
-  if(tw.type=="tesla"){chainZap(from,best,cur.dmg,cur.chain);return}
+  if(tw.type=="tesla"){chainZap(from,best,cur.dmg*SM,cur.chain);return}
   if(tw.type=="sniper"){
     sfx("shoot");
     const g=new THREE.BufferGeometry().setFromPoints([from,best.m.position.clone().setY(best.m.position.y+.5)]);
     const line=new THREE.Line(g,new THREE.LineBasicMaterial({color:0xe879f9,transparent:true}));
     scene.add(line);parts.push({m:line,v:null,l:.12,tl:.12,line:true});
-    burst(best.m.position,t.col,4,2);damage(best,cur.dmg,Math.random()<.15);
+    burst(best.m.position,t.col,4,2);damage(best,cur.dmg*SM,Math.random()<.15);
     return;
   }
   // projectiles
@@ -719,7 +722,7 @@ function fireTower(tw,dt){
   const geo=arch?new THREE.ConeGeometry(.07,.4,5):frost?new THREE.IcosahedronGeometry(.16):mort?new THREE.SphereGeometry(.28,8,6):new THREE.SphereGeometry(.2,8,6);
   const m=new THREE.Mesh(geo,new THREE.MeshBasicMaterial({color:frost?0x7dd3fc:mort?0xfb7185:arch?0xd9f99d:0xffa726}));
   m.position.copy(from);scene.add(m);
-  shots.push({kind:mort?"arc":arch?"dart":frost?"bolt":"shell",m,target:best,src:from.clone(),t:0,dur:arch?.35:mort?.9:frost?.4:.5,dmg:cur.dmg,tw:tw.type,cur});
+  shots.push({kind:mort?"arc":arch?"dart":frost?"bolt":"shell",m,target:best,src:from.clone(),t:0,dur:arch?.35:mort?.9:frost?.4:.5,dmg:cur.dmg*SM,tw:tw.type,cur});
   sfx(arch?"arrow":mort?"boom":"shoot",.6);
 }
 // ---------- hero ----------
@@ -941,56 +944,56 @@ function newGame(si){
   $("end").classList.remove("on");$("start").classList.remove("on");$("pause").classList.remove("on");
   hud();mkBar();say(ST.ic+" "+ST.n+" 🏰",2500);bannerShow(endless?"♾ لانهائي: "+ST.n:"المرحلة "+AR(stageIdx+1)+": "+ST.n+" ، "+AR(WMAX)+" موجة"+(hard?" 🔥":""),3200);
 }
-function camp(){try{const c=JSON.parse(localStorage.getItem("cg3d_camp")||"null");if(c&&c.s)return c}catch(e){}return{u:0,s:[0,0,0,0,0]}}
+function camp(){try{const c=JSON.parse(localStorage.getItem("cg3d_camp")||"null");if(c&&c.s){while(c.s.length<STAGES.length)c.s.push(0);if(c.s[4]>0&&c.u<5)c.u=5;return c}}catch(e){}return{u:0,s:[0,0,0,0,0,0]}}
 function saveCamp(c){try{localStorage.setItem("cg3d_camp",JSON.stringify(c))}catch(e){}}
 function stars(){return"⭐".repeat(0)}
 function renderStages(){
   const c=camp(),g=$("sg");g.innerHTML="";
   STAGES.forEach((S,i)=>{
     const b=document.createElement("button");const lock=i>c.u;
-    b.className="sc"+(lock?" lock":"")+(i==Math.min(c.u,4)?" cur":"");
+    b.className="sc"+(lock?" lock":"")+(i==Math.min(c.u,STAGES.length-1)?" cur":"");
     b.innerHTML="<b>"+(lock?"🔒":S.ic)+"</b>"+AR(i+1)+"<small>"+(c.s[i]?"★".repeat(c.s[i])+"☆".repeat(3-c.s[i]):(lock?"":"☆☆☆"))+"</small>";
     b.onclick=()=>{if(lock)return;audio();endless=false;newGame(i)};
     g.appendChild(b);
   });
   const t=c.s.reduce((a,b)=>a+b,0);
-  $("stn").textContent="النجوم: "+AR(t)+" / ١٥";
+  $("stn").textContent="النجوم: "+AR(t)+" / "+AR(STAGES.length*3);
   const h=hs();$("hsline").textContent=h.wave?"أحسن نتيجة: موجة "+AR(h.wave)+" ☠ "+AR(h.kills):"";
   $("go").textContent=c.u>0||c.s[0]?"كمّل الحملة ◀":"ابدأ اللعب";
 }
 function toMenu(){state="menu";$("ult").style.display="none";$("modb").style.display="none";paused=false;perkOpen=false;$("perk").classList.remove("on");$("end").classList.remove("on");$("pause").classList.remove("on");renderStages();$("start").classList.add("on")}
 function gameOver(win){
   state="over";$("ult").style.display="none";$("modb").style.display="none";saveHs();XST.runs++;XST.kills+=0;
-  if(win&&!endless){XST.wins++;if(hard)XST.hardwin++;if(stageIdx==4)XST.camp=true}
+  if(win&&!endless){XST.wins++;if(hard)XST.hardwin++;if(stageIdx==STAGES.length-1)XST.camp=true}
   if(endless)XST.endw=Math.max(XST.endw,wave);
   const h=hs();
   let st=0,unlockedNext=false;
   if(win&&!endless){
     st=lives>=ST.lives*.75?3:lives>=ST.lives*.4?2:1;
     const c=camp();c.s[stageIdx]=Math.max(c.s[stageIdx]||0,st);
-    if(stageIdx<4&&c.u<stageIdx+1){c.u=stageIdx+1;unlockedNext=true}
+    if(stageIdx<STAGES.length-1&&c.u<stageIdx+1){c.u=stageIdx+1;unlockedNext=true}
     saveCamp(c);XST.stars=c.s.reduce((a,b)=>a+b,0);XST.star3=c.s.filter(v=>v>=3).length;
   }
-  $("et").textContent=win?(stageIdx==4?"🏆 خلصت الحملة! حارس أسطوري":"🏆 المرحلة اتحلت!"):"💔 وقعت القلعة…";
+  $("et").textContent=win?(stageIdx==STAGES.length-1?"🏆 خلصت الحملة! حارس أسطوري":"🏆 المرحلة اتحلت!"):"💔 وقعت القلعة…";
   $("est").innerHTML="<div><b>"+AR(wave)+"</b>موجة</div><div><b>"+AR(kills)+"</b>قتلة</div><div><b>"+AR(dmgDealt)+"</b>ضرر</div><div><b>"+AR(goldEarned)+"</b>ذهب</div>";
   $("ep").innerHTML=win?("نجوم المرحلة: "+"★".repeat(st)+"☆".repeat(3-st)+(unlockedNext?"<br>🔓 اتفتحت المرحلة "+AR(stageIdx+2)+": "+STAGES[stageIdx+1].n:"")):("وصلت للموجة "+AR(wave)+" من "+AR(WMAX)+" في "+ST.n+".");
   {let gems=win?(5+stageIdx*3+st*2):Math.floor(wave/2);if(endless)gems=Math.floor(wave*1.2);if(hard)gems=Math.ceil(gems*1.5);
    const m=meta();m.gems+=gems;saveMeta(m);$("ep").innerHTML+="<br>💎 +"+AR(gems)+" جوهرة"+(hard?" (صعب ×١.٥)":"");
    if(endless){const b=+localStorage.getItem("cg3d_end")||0;if(wave>b){localStorage.setItem("cg3d_end",wave);$("ep").innerHTML+="<br>🏅 رقم قياسي جديد في اللانهائي!"}}}
   chkAch();
-  $("nxt").style.display=(win&&stageIdx<4&&!endless)?"":"none";
+  $("nxt").style.display=(win&&stageIdx<STAGES.length-1&&!endless)?"":"none";
   $("end").classList.add("on");
   sfx(win?"win":"lose");
 }
 $("achb").onclick=showAch;
-$("go").onclick=()=>{audio();endless=false;const c=camp();newGame(Math.min(c.u,4))};
-$("endlessb").onclick=()=>{audio();endless=true;const c=camp();newGame(Math.min(c.u,4))};
+$("go").onclick=()=>{audio();endless=false;const c=camp();newGame(Math.min(c.u,STAGES.length-1))};
+$("endlessb").onclick=()=>{audio();endless=true;const c=camp();newGame(Math.min(c.u,STAGES.length-1))};
 function syncHard(){$("hardb").className="btn xs"+(hard?" on":"");$("hardb").textContent=hard?"🔥 صعب: شغال":"🔥 صعب"}
 $("hardb").onclick=()=>{hard=!hard;localStorage.setItem("cg3d_hard",hard?"1":"0");syncHard()};syncHard();
 $("shopb").onclick=()=>{renderShop();$("shop").classList.add("on")};
 $("shback").onclick=()=>$("shop").classList.remove("on");
 $("again").onclick=()=>{audio();newGame(stageIdx)};
-$("nxt").onclick=()=>{audio();endless=false;newGame(Math.min(stageIdx+1,4))};
+$("nxt").onclick=()=>{audio();endless=false;newGame(Math.min(stageIdx+1,STAGES.length-1))};
 function syncOpts(){$("autob").textContent=autoWave?"⏭ موجة أوتو: شغال":"⏭ موجة أوتو: مقفول";$("autob").classList.toggle("on2",autoWave);$("qualb").textContent=lowQ?"🎨 جودة: خفيفة":"🎨 جودة: عالية"}
 function applyQ(){renderer.setPixelRatio(lowQ?1:Math.min(devicePixelRatio,2));renderer.shadowMap.enabled=!lowQ;sun.castShadow=!lowQ;scene.traverse(o=>{if(o.material){const ms=Array.isArray(o.material)?o.material:[o.material];ms.forEach(m=>m.needsUpdate=true)}});renderer.setSize(innerWidth,innerHeight)}
 $("autob").onclick=()=>{autoWave=!autoWave;localStorage.setItem("cg3d_auto",autoWave?"1":"0");syncOpts()};
@@ -1062,7 +1065,7 @@ window.__enemies=()=>enemies.slice(0,3).map(e=>({t:e.t,prog:e.prog,delay:e.delay
 window.__pathlen=PATHLEN;
 window.__cellScreen=(c,r)=>{const p=cellPos(c,r).clone().project(cam);return{x:(p.x+1)/2*innerWidth,y:(-p.y+1)/2*innerHeight}};
 window.__set=(k,v)=>{if(k=='wave')wave=v;else if(k=='gold')gold=v;else if(k=='lives')lives=v;else if(k=='speed')speedMul=v;hud()};
-window.__startWave=startWave;window.__hero=()=>({pos:hero&&hero.position.toArray(),target:heroTarget&&heroTarget.toArray(),names:hero&&hero.userData.names,cur:hero&&hero.userData.cur,perk});window.__perk=offerPerk;window.__hl=()=>({heroLv,heroXp});window.__spawn=(t)=>{spawnEnemy(t)};window.__gain=heroGain;window.__dmg=(t,a)=>{const e=enemies.find(x=>x.t==t&&!x.dead);if(e)damage(e,a)};window.__ult=ultimate;window.__mod=()=>mod;window.__light=()=>({h:hemi.intensity,s:sun.intensity});window.__tapxy=null;window.__cam=cam;window.__look=camLook;window.__base=camBase;
+window.__startWave=startWave;window.__hero=()=>({pos:hero&&hero.position.toArray(),target:heroTarget&&heroTarget.toArray(),names:hero&&hero.userData.names,cur:hero&&hero.userData.cur,perk});window.__perk=offerPerk;window.__stage=i=>{endless=false;newGame(i)};window.__hl=()=>({heroLv,heroXp});window.__spawn=(t)=>{spawnEnemy(t)};window.__gain=heroGain;window.__dmg=(t,a)=>{const e=enemies.find(x=>x.t==t&&!x.dead);if(e)damage(e,a)};window.__ult=ultimate;window.__mod=()=>mod;window.__light=()=>({h:hemi.intensity,s:sun.intensity});window.__tapxy=null;window.__cam=cam;window.__look=camLook;window.__base=camBase;
 window.__towers=()=>towers.map(t=>({type:t.type,lv:t.lv,c:t.c,r:t.r}));
 </script>
 </body>
