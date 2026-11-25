@@ -110,7 +110,7 @@ canvas{display:block;position:fixed;inset:0;touch-action:none}
   <p id="dch" style="font-size:14px;color:#86efac;margin:2px 0;font-weight:700"></p>
   <p id="greet" style="font-size:16px;color:#fde68a;margin:4px 0;font-weight:700"></p>
   <p class="hs" id="hsline"></p>
-  <p id="ver" style="font-size:11px;opacity:.6;margin:2px 0">🏰 حارس القلعة ثلاثي الأبعاد · تحديث ٧٥</p>
+  <p id="ver" style="font-size:11px;opacity:.6;margin:2px 0">🏰 حارس القلعة ثلاثي الأبعاد · تحديث ٨١</p>
   <button class="btn" id="go">ابدأ اللعب</button>
   <div class="mini"><button class="btn xs" id="endlessb">♾ لانهائي</button><button class="btn xs" id="hardb">🔥 صعب</button><button class="btn xs" id="shopb">💎 تحسينات</button><button class="btn xs" id="achb">🏅 إنجازات</button></div>
 </div>
@@ -188,7 +188,8 @@ const STAGES=[
  {n:"قمة التلج",ic:"❄️",path:[[0,1],[6,1],[6,3],[2,3],[2,5],[6,5],[6,7],[2,7],[2,9],[6,9],[6,11],[8,11],[8,12]],waves:15,hp:1.45,gold:210,lives:18,theme:{ground:0xdfe9f2,fog:0xbcd2e6,g1:0xe6eef6,g2:0xdde8f2,road:0x7c6a55,road2:0xa9b3c2,tuft:0xaec4d8}},
  {n:"جبل النار",ic:"🌋",path:[[0,1],[8,1],[8,3],[0,3],[0,5],[8,5],[8,7],[0,7],[0,9],[8,9],[8,12]],waves:18,hp:1.9,gold:240,lives:15,theme:{ground:0x3a2a2a,fog:0x6b3a2e,g1:0x5a3a34,g2:0x4d3029,road:0x2a1d1a,road2:0x5a3a2a,tuft:0xb0451f}},
  {n:"المدينة المسحورة",ic:"🔮",path:[[0,1],[8,1],[8,3],[1,3],[1,5],[7,5],[7,7],[2,7],[2,9],[6,9],[6,11],[8,11],[8,12]],waves:20,hp:2.3,gold:250,lives:12,theme:{ground:0x2a2144,fog:0x3b2a63,g1:0x4b3a78,g2:0x40316b,road:0x4a3a78,road2:0x8f7cc4,tuft:0x8b5cf6}},
- {n:"المعبد الذهبي",ic:"🏛️",path:[[0,1],[8,1],[8,4],[0,4],[0,6],[6,6],[6,8],[2,8],[2,10],[8,10],[8,12]],waves:20,hp:2.8,gold:260,lives:12,theme:{ground:0x4a4a3a,fog:0xe6c565,g1:0x5a5a3f,g2:0x50503a,road:0xcdb68a,road2:0xe6d3a3,tuft:0xf5d36b}}
+ {n:"المعبد الذهبي",ic:"🏛️",path:[[0,1],[8,1],[8,4],[0,4],[0,6],[6,6],[6,8],[2,8],[2,10],[8,10],[8,12]],waves:20,hp:2.8,gold:260,lives:12,theme:{ground:0x4a4a3a,fog:0xe6c565,g1:0x5a5a3f,g2:0x50503a,road:0xcdb68a,road2:0xe6d3a3,tuft:0xf5d36b}},
+ {n:"بوابة الفراغ",ic:"🌑",path:[[0,1],[8,1],[8,3],[0,3],[0,5],[8,5],[8,7],[1,7],[1,9],[7,9],[7,11],[8,11],[8,12]],waves:22,hp:3.4,gold:280,lives:10,theme:{ground:0x1a1020,fog:0x2a0f2e,g1:0x2e1a3a,g2:0x261530,road:0x120c18,road2:0x4a1d5a,tuft:0xe11d48}}
 ];
 let ST=STAGES[0],stageIdx=0,WMAX=10;
 let PATH,pathCells,curve,PATHLEN;
@@ -335,6 +336,8 @@ const TW={
   lv:[{cost:130,dmg:22,rate:.8,range:5,chain:3},{cost:110,dmg:34,rate:.85,range:5.4,chain:4},{cost:185,dmg:52,rate:.9,range:5.8,chain:5},{cost:320,dmg:80,rate:.95,range:6.2,chain:7}],col:0xfde047},
  mortar:{n:"هاون",ic:"🌋",canFly:false,splash:2.4,stun:.8,desc:"قصف بعيد يُذهل",
   lv:[{cost:150,dmg:34,rate:.5,range:7.5,splash:2.4,stun:.8},{cost:130,dmg:55,rate:.52,range:7.9,splash:2.6,stun:.9},{cost:220,dmg:88,rate:.55,range:8.3,splash:2.8,stun:1},{cost:380,dmg:140,rate:.6,range:8.8,splash:3.1,stun:1.2}],col:0xfb7185},
+ laser:{n:"ليزر",ic:"🔦",canFly:true,desc:"شعاع بيقوى كل ما يفضل على نفس العدو",
+  lv:[{cost:170,dmg:5,rate:8,range:5.4},{cost:140,dmg:8,rate:8,range:5.8},{cost:230,dmg:12,rate:8,range:6.2},{cost:400,dmg:19,rate:8,range:6.8}],col:0x22d3ee},
  venom:{n:"سم",ic:"🧪",canFly:true,desc:"سم بيحرق العدو مع الوقت",
   lv:[{cost:90,dmg:7,rate:1.1,range:5,pt:4},{cost:75,dmg:12,rate:1.2,range:5.3,pt:4},{cost:120,dmg:19,rate:1.3,range:5.6,pt:5},{cost:210,dmg:30,rate:1.4,range:6,pt:6}],col:0x10b981},
 };
@@ -342,12 +345,13 @@ const TARGET_MODES=["first","strong","close"],TMN={first:"الأقرب للقل�
 function towerModel(type,lv){
   const d=TW[type],g=new THREE.Group();
   const kind=type=="archer"?"towerA":(type=="cannon"||type=="mortar")?"catapult":"towerB";
-  const hh={archer:2.6,cannon:2.3,frost:3.0,sniper:3.4,tesla:3.1,mortar:2.1,venom:2.7}[type]*(1+.07*(lv-1));
+  const hh={archer:2.6,cannon:2.3,frost:3.0,sniper:3.4,tesla:3.1,mortar:2.1,venom:2.7,laser:3.2}[type]*(1+.07*(lv-1));
   const m=inst(kind,{h:hh,tint:d.col,tintMix:.38});g.add(m);
   if(type=="frost"||type=="tesla"){const orb=new THREE.Mesh(new THREE.IcosahedronGeometry(.26+lv*.04,1),new THREE.MeshBasicMaterial({color:type=="frost"?0x9be4ff:0xfff176}));orb.position.y=hh+.3;g.add(orb);g.userData.orb=orb;
     const pl=new THREE.PointLight(d.col,.9,4);pl.position.y=hh+.3;g.add(pl)}
   if(type=="venom"){const fl=new THREE.Mesh(new THREE.SphereGeometry(.28+lv*.03,10,8),new THREE.MeshBasicMaterial({color:0x34d399,transparent:true,opacity:.85}));fl.position.y=hh+.3;g.add(fl);g.userData.orb=fl}
   if(type=="sniper"){const sc=new THREE.Mesh(new THREE.TorusGeometry(.2,.05,6,14),new THREE.MeshBasicMaterial({color:0xe879f9}));sc.position.y=hh+.35;sc.rotation.x=Math.PI/2;g.add(sc);g.userData.orb=sc}
+  if(type=="laser"){const lo=new THREE.Mesh(new THREE.OctahedronGeometry(.3+lv*.04,0),new THREE.MeshBasicMaterial({color:0x67e8f9}));lo.position.y=hh+.35;g.add(lo);g.userData.orb=lo;const lr=new THREE.Mesh(new THREE.TorusGeometry(.42,.04,6,20),new THREE.MeshBasicMaterial({color:0x22d3ee}));lr.rotation.x=Math.PI/2;lr.position.y=hh+.35;g.add(lr)}
   if(type=="cannon"||type=="mortar")g.userData.barrel=true;
   if(lv==4){const rg=new THREE.Mesh(new THREE.TorusGeometry(.8,.06,6,28),new THREE.MeshBasicMaterial({color:0xfacc15,transparent:true,opacity:.9}));rg.rotation.x=Math.PI/2;rg.position.y=.15;g.add(rg);g.userData.ring=rg}
   // level pips
@@ -369,6 +373,7 @@ const EN={
  bat:{hp:28,spd:3.4,gold:5,dmg:1,scale:.42,col:0x7c3aed,fly:true,name:"خفاش"},
  ghostking:{hp:5200,spd:.95,gold:420,dmg:15,scale:1.75,col:0xa78bfa,boss:true,name:"ملك الأشباح"},
  berserker:{hp:380,spd:1.3,gold:28,dmg:3,scale:.95,col:0xef4444,name:"مسعور"},
+ voidlord:{hp:11000,spd:.85,gold:600,dmg:25,scale:1.85,col:0xa21caf,boss:true,armor:true,name:"سيّد الفراغ"},
  pharaoh:{hp:7800,spd:.9,gold:450,dmg:18,scale:1.7,col:0xd4af37,boss:true,armor:true,name:"الفرعون"},
  mini:{hp:34,spd:3.2,gold:2,dmg:1,scale:.42,col:0xfb923c,name:"صغير"},
  boss:{hp:3400,spd:.95,gold:250,dmg:12,scale:1.55,col:0x111111,boss:true,name:"الزعيم"},
@@ -379,6 +384,7 @@ function enemyModel(t){
   const cfg={ghostking:["sk_warrior",{anim:"Walking_B",animSpeed:.8,tint:0xa78bfa,tintMix:.7,emissive:0x6d28d9,ei:.7}],bat:["sk_minion",{anim:"Jump_Idle",tint:0x7c3aed,tintMix:.6}],dragon:["sk_mage",{anim:"Jump_Idle",tint:0xdc2626,tintMix:.65,emissive:0xff2200,ei:.5}],wraith:["sk_rogue",{anim:"Walking_A",animSpeed:1.1,tint:0xa78bfa,tintMix:.7,emissive:0x5b21b6,ei:.6}],splitter:["sk_rogue",{anim:"Walking_A",animSpeed:1.2,tint:0xff9a4d,tintMix:.55}],armored:["sk_warrior",{anim:"Walking_A",animSpeed:.9,tint:0xd9b44a,tintMix:.6,emissive:0x553300,ei:.3}],mini:["sk_minion",{anim:"Running_A",animSpeed:1.5,tint:0xfb923c,tintMix:.5}],grunt:["sk_minion",{anim:"Walking_A",animSpeed:1.3}],runner:["sk_rogue",{anim:"Running_A",animSpeed:1.3}],brute:["sk_warrior",{anim:"Walking_B",animSpeed:.9,tint:0x9a6bff,tintMix:.45}],
     healer:["sk_mage",{anim:"Walking_A",tint:0x6ee7a0,tintMix:.5}],shield:["sk_warrior",{anim:"Walking_A",tint:0x8fa6c4,tintMix:.5}],flyer:["sk_mage",{anim:"Jump_Idle",tint:0x67e8f9,tintMix:.55}],
     berserker:["sk_warrior",{anim:"Walking_A",animSpeed:1.1,tint:0xef4444,tintMix:.55,emissive:0x991b1b,ei:.4}],
+    voidlord:["sk_warrior",{anim:"Walking_B",animSpeed:.7,tint:0x6b21a8,tintMix:.75,emissive:0xe11d48,ei:.8}],
     pharaoh:["sk_warrior",{anim:"Walking_B",animSpeed:.75,tint:0xffd34d,tintMix:.7,emissive:0xb8860b,ei:.5}],
     boss:["sk_warrior",{anim:"Walking_B",animSpeed:.8,tint:0x555555,tintMix:.6,emissive:0xff2200,ei:.35}],titan:["sk_warrior",{anim:"Walking_B",animSpeed:.7,tint:0x7a1212,tintMix:.55,emissive:0xff3300,ei:.5}]}[t];
   const m=inst(cfg[0],Object.assign({h:H},cfg[1]));g.add(m);
@@ -387,7 +393,8 @@ function enemyModel(t){
     const w1=new THREE.Mesh(new THREE.PlaneGeometry(1.1,.55),wM);w1.position.set(-.8,H*.7,-.1);g.add(w1);
     const w2=w1.clone();w2.position.x=.8;g.add(w2);g.userData.wings=[w1,w2]}
   if(t=="healer"){const cr=new THREE.Mesh(new THREE.TorusGeometry(.4,.07,5,12),new THREE.MeshBasicMaterial({color:0x4ade80}));cr.rotation.x=Math.PI/2;cr.position.y=H+.3;g.add(cr);g.userData.halo=cr}
-  if(d.boss){const l=new THREE.PointLight(0xff3300,1.2,6);l.position.y=H*.6;g.add(l)}
+  if(d.boss){const l=new THREE.PointLight(t=="voidlord"?0xc026d3:0xff3300,1.2,6);l.position.y=H*.6;g.add(l)}
+  if(t=="voidlord"){const r1=new THREE.Mesh(new THREE.TorusGeometry(.95,.07,6,24),new THREE.MeshBasicMaterial({color:0xe879f9}));r1.rotation.x=Math.PI/2;r1.position.y=.25;g.add(r1);const r2=new THREE.Mesh(new THREE.TorusGeometry(.7,.05,6,24),new THREE.MeshBasicMaterial({color:0xe11d48}));r2.position.y=H+.45;g.add(r2);g.userData.halo=r2}
   return g;
 }
 // ---------- state ----------
@@ -406,7 +413,7 @@ function chkAch(){dchTick();try{localStorage.setItem("cg3d_stats",JSON.stringify
 function showAch(){$("achl").innerHTML=ACHS.map(a=>(XAH[a[0]]?"✅ ":"🔒 ")+"<b>"+a[1]+"</b> · "+a[2]).join("<br>");
  $("achs").textContent="قتلى "+XST.kills+" · جولات "+XST.runs+" · انتصارات "+XST.wins+" · أعلى موجة لانهائي "+XST.endw;$("ach").classList.add("on");$("achx").onclick=()=>$("ach").classList.remove("on")}
 let endless=false,hard=localStorage.getItem("cg3d_hard")=="1",combo=0,lastKill=-9,slowmo=0,DMGM=1;
-const EMO={ghostking:"👻",bat:"🦇",dragon:"🐉",wraith:"👻",grunt:"💀",runner:"💨",brute:"👹",pharaoh:"🏺",berserker:"😡",healer:"💚",shield:"🛡",flyer:"🦇",boss:"👑",titan:"🔥",splitter:"🧬",armored:"⚙",mini:"🐜"};
+const EMO={ghostking:"👻",bat:"🦇",dragon:"🐉",wraith:"👻",grunt:"💀",runner:"💨",brute:"👹",pharaoh:"🏺",voidlord:"🌑",berserker:"😡",healer:"💚",shield:"🛡",flyer:"🦇",boss:"👑",titan:"🔥",splitter:"🧬",armored:"⚙",mini:"🐜"};
 function meta(){try{const m=JSON.parse(localStorage.getItem("cg3d_meta")||"null");if(m&&m.lv)return m}catch(e){}return{gems:0,lv:{gold:0,dmg:0,hp:0,abil:0,hero:0}}}
 function saveMeta(m){try{localStorage.setItem("cg3d_meta",JSON.stringify(m))}catch(e){}}
 const SHOP=[{k:"hero",n:"قوة البطل 🛡",d:"+٢٥٪ ضرر البطل و+٢٠٪ سرعة ضرب",base:6},{k:"gold",n:"ذهب البداية",d:"+٤٠ ذهب في كل مرحلة",base:6},{k:"dmg",n:"قوة الأبراج",d:"+٨٪ ضرر لكل الأبراج",base:8},{k:"hp",n:"أسوار القلعة",d:"+٢ حياة",base:7},{k:"abil",n:"سحر أسرع",d:"-٦٪ انتظار النيزك والتجميد",base:8}];
@@ -435,7 +442,7 @@ function buildWeather(){
   if(weather){scene.remove(weather);weather.geometry.dispose();weather=null}
   const N=420,pos=new Float32Array(N*3),spd=[];
   for(let i=0;i<N;i++){pos[i*3]=(Math.random()-.5)*46;pos[i*3+1]=Math.random()*22;pos[i*3+2]=(Math.random()-.5)*52;spd.push(.4+Math.random())}
-  const cfgW=[{c:0xfff3a0,sz:.12,vy:-.15,up:false},{c:0x8bd36a,sz:.22,vy:-1.1,up:false},{c:0xe8c98f,sz:.1,vy:-.2,up:false,wind:3},{c:0xffffff,sz:.2,vy:-2,up:false},{c:0xff7a1a,sz:.16,vy:2.2,up:true},{c:0xc4b5fd,sz:.17,vy:-.35,up:false}][stageIdx]||{c:0xffffff,sz:.1,vy:-.2};
+  const cfgW=[{c:0xfff3a0,sz:.12,vy:-.15,up:false},{c:0x8bd36a,sz:.22,vy:-1.1,up:false},{c:0xe8c98f,sz:.1,vy:-.2,up:false,wind:3},{c:0xffffff,sz:.2,vy:-2,up:false},{c:0xff7a1a,sz:.16,vy:2.2,up:true},{c:0xc4b5fd,sz:.17,vy:-.35,up:false},{c:0xffe08a,sz:.12,vy:-.25,up:false,wind:1.5},{c:0xe11d48,sz:.18,vy:1.6,up:true}][stageIdx]||{c:0xffffff,sz:.1,vy:-.2};
   const g=new THREE.BufferGeometry();g.setAttribute("position",new THREE.BufferAttribute(pos,3));
   weather=new THREE.Points(g,new THREE.PointsMaterial({color:cfgW.c,size:cfgW.sz,transparent:true,opacity:.85,depthWrite:false,sizeAttenuation:true}));
   weather.userData={spd,cfg:cfgW};weather.frustumCulled=false;scene.add(weather);
@@ -494,7 +501,7 @@ function waveComp(w0){
   else if(w==13){push("flyer",14);push("brute",6);push("healer",3)}
   else if(w==14){push("dragon",1);push("brute",8);push("shield",8);push("healer",5);push("runner",10)}
   else if(w==15){push("titan",1);push("boss",1);push("healer",4);push("flyer",8);push("brute",6)}
-  if((stageIdx==5||stageIdx==6)&&(w==11||w==15))push(stageIdx==6?"pharaoh":"ghostking",1);
+  if((stageIdx==5||stageIdx==6||stageIdx==7)&&(w==11||w==15))push(stageIdx==7?"voidlord":stageIdx==6?"pharaoh":"ghostking",1);
   if(w>=6&&w!=8&&w!=15)push("berserker",Math.floor((w-4)/2));
   if(w>=9&&w!=8&&w!=15)push("wraith",Math.floor((w-6)/2));
   if(w>=5&&w!=8&&w!=15)push("armored",Math.floor((w-3)/2));
@@ -798,6 +805,14 @@ function fireTower(tw,dt){
   // aim barrel
   const br=tw.m.userData.barrel;
   if(br){const dir=best.m.position.clone().sub(tw.m.position);tw.m.rotation.y=Math.atan2(dir.x,dir.z)}
+  if(tw.type=="laser"){
+    if(tw.lt===best)tw.rmp=Math.min(30,(tw.rmp||0)+1);else{tw.rmp=0;tw.lt=best}
+    const lg=new THREE.BufferGeometry().setFromPoints([from,best.m.position.clone().setY(best.m.position.y+.6)]);
+    const ln=new THREE.Line(lg,new THREE.LineBasicMaterial({color:tw.rmp>=20?0xfef08a:0x22d3ee,transparent:true}));
+    scene.add(ln);parts.push({m:ln,v:null,l:.1,tl:.1,line:true});
+    lastTw=tw;damage(best,cur.dmg*SM*(1+tw.rmp*.1),false);
+    if(tw.rmp%5==0){burst(best.m.position,0x67e8f9,2,2);sfx("shoot",.25)}
+    window.__lz=tw.rmp;return}
   if(tw.type=="tesla"){chainZap(from,best,cur.dmg*SM,cur.chain);return}
   if(tw.type=="sniper"){
     sfx("shoot");
@@ -939,6 +954,7 @@ function updateEnemies(dt){
   for(const e of enemies){
     if(e.dead)continue;
     flashTick(e,dt);
+    if(e.t=="voidlord"&&e.delay<=0&&!(e.stun>0)){if(e.bk==null)e.bk=5;e.bk-=dt;if(e.bk<=0){e.bk=7;burst(e.m.position,0xe11d48,22,8);e.prog+=.035;e.dist+=2.1;floatText(e.m.position,"🌀 وميض","#e879f9");window.__blink=(window.__blink||0)+1}}
     if(e.t=="pharaoh"&&e.hp<e.max){e.hp=Math.min(e.max,e.hp+e.max*.012*dt);e.fg.scale.x=clamp(e.hp/e.max,0,1);e.fg.position.x=-(1-e.fg.scale.x)*.63;window.__preg=1}
     {const sk=e.pois?1:e.slowT>0?2:e.stun>0?3:0;if(e.stk!==sk){e.stk=sk;e.stb.visible=sk>0;if(sk)e.stb.material.color.setHex(sk==1?0x34d399:sk==2?0x38bdf8:0xfacc15);window.__stk=sk}}
     if(e.pois){e.pois.t-=dt;e.pois.acc+=dt;if(e.pois.acc>=.5){e.pois.acc-=.5;burst(e.m.position,0x34d399,2,2);damage(e,e.pois.dps*.5);window.__pdmg=(window.__pdmg||0)+1;if(e.dead)continue}if(e.pois.t<=0)e.pois=null}
@@ -1031,7 +1047,7 @@ function updateParts(dt){
   floats=floats.filter(f=>!f.gone);
 }
 function hazardWarn(tw){
-  const col=stageIdx==5?0xa78bfa:0xff4010;
+  const col=stageIdx==7?0xe11d48:stageIdx==5?0xa78bfa:0xff4010;
   const rg=new THREE.Mesh(new THREE.RingGeometry(1.7,2.1,32),new THREE.MeshBasicMaterial({color:col,side:2,transparent:true,opacity:.9,depthWrite:false}));rg.rotation.x=-Math.PI/2;rg.position.set(tw.m.position.x,.2,tw.m.position.z);scene.add(rg);
   const fl=new THREE.Mesh(new THREE.CircleGeometry(1.7,32),new THREE.MeshBasicMaterial({color:col,transparent:true,opacity:.25,depthWrite:false}));fl.rotation.x=-Math.PI/2;fl.position.set(tw.m.position.x,.15,tw.m.position.z);scene.add(fl);
   hzWarn.push({tw,rg,fl,t:1.6,x:tw.m.position.x,z:tw.m.position.z});
@@ -1050,7 +1066,7 @@ function updateHazards(dt){
   hzT-=dt;
   if(hzT<=0){
     if(stageIdx==3){hzT=26;bliz=6;bannerShow("🌨 عاصفة ثلجية! المدى -٢٥٪ لمدة ٦ ثواني",3000);const mb=$("modb");mb.textContent="🌨 عاصفة ثلجية";mb.style.display="block"}
-    else{hzT=stageIdx==4?13:15;if(towers.length){const tw=towers[Math.floor(Math.random()*towers.length)];hazardWarn(tw);bannerShow(stageIdx==5?"🔮 لعنة قادمة على برج!":"🌋 ثوران بركان على برج!",2000)}}
+    else{hzT=stageIdx==7?11:stageIdx==4?13:15;if(stageIdx==7&&towers.length){for(const tw of towers.slice().sort(()=>Math.random()-.5).slice(0,3))hazardWarn(tw);bannerShow("☄ مطر نيازك على ٣ أبراج!",2200);window.__rain=(window.__rain||0)+1}else if(towers.length){const tw=towers[Math.floor(Math.random()*towers.length)];hazardWarn(tw);bannerShow(stageIdx==5?"🔮 لعنة قادمة على برج!":"🌋 ثوران بركان على برج!",2000)}}
   }
 }
 function updateTowers(dt){
