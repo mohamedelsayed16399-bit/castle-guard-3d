@@ -114,7 +114,7 @@ canvas{display:block;position:fixed;inset:0;touch-action:none}
 <div class="ov" id="end">
   <h1 id="et"></h1>
   <div class="st" id="est"></div>
-  <p id="ep"></p>
+  <p id="ep"></p><p id="ek" style="font-size:15px;color:#fde68a;margin:4px 0"></p>
   <button class="btn" id="nxt" style="display:none">المرحلة التالية ◀</button>
   <button class="btn" id="again">العب تاني</button>
   <button class="btn sm" id="tomenu">كل المراحل</button>
@@ -733,7 +733,7 @@ function damage(e,amt,crit=false){
   if(e.hp<=0)kill(e);
 }
 function kill(e){
-  if(e.by&&towers.includes(e.by))e.by.kills=(e.by.kills||0)+1;e.dead=true;kills++;XST.kills++;comboHit();if((XST.kills&7)==0)chkAch();{const g0=Math.round(e.d.gold*perk.gold*(mod&&mod.gold||1));gold+=g0;goldEarned+=g0;floatText(e.m.position,"+"+g0,e.d.boss?"#f472b6":"#fde047")}
+  if(e.by&&towers.includes(e.by))e.by.kills=(e.by.kills||0)+1;e.dead=true;kills++;window.KB=window.KB||{};KB[e.t]=(KB[e.t]||0)+1;XST.kills++;comboHit();if((XST.kills&7)==0)chkAch();{const g0=Math.round(e.d.gold*perk.gold*(mod&&mod.gold||1));gold+=g0;goldEarned+=g0;floatText(e.m.position,"+"+g0,e.d.boss?"#f472b6":"#fde047")}
   combo=(clockT-lastKill<2.2)?combo+1:1;lastKill=clockT;
   if(combo>=6&&combo%6==0){const b=combo;gold+=b;goldEarned+=b;floatText(e.m.position,"🔥x"+combo+" +"+b,"#fb923c")}
   if(e.d.splits){for(let i=0;i<2;i++){const c=spawnEnemy("mini");c.prog=Math.max(0,(e.prog||0)-.01*i);c.dist=e.dist;const p=curve.getPointAt(clamp(c.prog,0,1));c.m.position.set(p.x,0,p.z)}burst(e.m.position,0xf97316,12,5)}
@@ -1098,7 +1098,7 @@ function newGame(si){
   for(const f of floats)scene.remove(f.s);
   for(const c of cells)c.userData.taken=false;
   enemies=[];towers=[];shots=[];parts=[];floats=[];queue=[];
-  window.__t0=performance.now();shieldN=0;shCd=0;gold=ST.gold+40*(meta().lv.gold||0);lives=ST.lives+2*(meta().lv.hp||0);combo=0;comboN=0;comboBest=0;waveG=[];undoTw=null;$("undob").style.display="none";$("lowfx").style.display="none";perfS=0;duskT=0;duskC=0;slowmo=0;wave=0;kills=0;dmgDealt=0;goldEarned=0;inWave=false;state="play";speedMul=1;paused=false;bossAlive=false;
+  window.__t0=performance.now();window.KB={};shieldN=0;shCd=0;gold=ST.gold+40*(meta().lv.gold||0);lives=ST.lives+2*(meta().lv.hp||0);combo=0;comboN=0;comboBest=0;waveG=[];undoTw=null;$("undob").style.display="none";$("lowfx").style.display="none";perfS=0;duskT=0;duskC=0;slowmo=0;wave=0;kills=0;dmgDealt=0;goldEarned=0;inWave=false;state="play";speedMul=1;paused=false;bossAlive=false;
   abMeteor.cd=0;abFreeze.cd=0;buildType=null;closePop();for(const k of chests)scene.remove(k.m);chests=[];for(const h of hzWarn){scene.remove(h.rg);scene.remove(h.fl)}hzWarn=[];bliz=0;hzT=18;perk={dmg:1,range:1,rate:1,gold:1,hero:1,got:[]};heroXp=0;heroLv=1;mod=null;ultCd=6;healCd=20;$("modb").style.display="none";perkOpen=false;$("perk").classList.remove("on");spawnHero();if(!heroHint){heroHint=true;setTimeout(()=>bannerShow("🛡 البطل: دوس على أي مكان فاضي عشان تحرّكه",4200),3400)}
   $("end").classList.remove("on");$("start").classList.remove("on");$("pause").classList.remove("on");
   hud();mkBar();say(ST.ic+" "+ST.n+" 🏰",2500);
@@ -1127,7 +1127,7 @@ function renderStages(){
 }
 function toMenu(){state="menu";$("heal").style.display="none";$("ult").style.display="none";$("modb").style.display="none";paused=false;perkOpen=false;$("perk").classList.remove("on");$("end").classList.remove("on");$("pause").classList.remove("on");renderStages();$("start").classList.add("on")}
 function gameOver(win){
-  state="over";$("heal").style.display="none";$("ult").style.display="none";$("modb").style.display="none";saveHs();XST.runs++;if(!endless){try{const b=bwGet();b[stageIdx]=Math.max(b[stageIdx]||0,win?WMAX:wave);localStorage.setItem("cg3d_bw",JSON.stringify(b))}catch(e){}}XST.kills+=0;
+  state="over";{const ks=Object.keys(window.KB||{}).sort((a,b)=>KB[b]-KB[a]).slice(0,6);$("ek").textContent=ks.length?"القتلى: "+ks.map(k=>(EMO[k]||"•")+AR(KB[k])).join("  "):"";window.__ek=$("ek").textContent}$("heal").style.display="none";$("ult").style.display="none";$("modb").style.display="none";saveHs();XST.runs++;if(!endless){try{const b=bwGet();b[stageIdx]=Math.max(b[stageIdx]||0,win?WMAX:wave);localStorage.setItem("cg3d_bw",JSON.stringify(b))}catch(e){}}XST.kills+=0;
   if(win&&!endless){XST.wins++;if(hard)XST.hardwin++;if(stageIdx==5)XST.camp=true}
   if(endless)XST.endw=Math.max(XST.endw,wave);
   const h=hs();
