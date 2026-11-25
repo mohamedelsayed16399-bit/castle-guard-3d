@@ -14,8 +14,8 @@ canvas{display:block;position:fixed;inset:0;touch-action:none}
 #hud .it{display:flex;gap:4px;align-items:center;white-space:nowrap}
 #wbar{height:7px;margin-top:7px;background:#ffffff22;border-radius:99px;overflow:hidden}
 #wfill{height:100%;width:0%;background:linear-gradient(90deg,#f97316,#facc15);border-radius:99px;transition:width .3s}
-#bar{position:fixed;bottom:0;left:0;right:0;padding:8px 8px calc(8px + env(safe-area-inset-bottom));background:linear-gradient(0deg,#07111f,#07111fcc);display:flex;gap:5px;align-items:stretch;z-index:2;border-top:1px solid #ffffff18}
-.tb{flex:1;background:linear-gradient(180deg,#1c2b42,#131f31);border:2px solid #ffffff14;border-radius:14px;color:#fff;padding:5px 1px 3px;font-family:inherit;font-size:11px;line-height:1.35;cursor:pointer;transition:transform .08s}
+#bar{position:fixed;bottom:0;left:0;right:0;padding:8px 8px calc(8px + env(safe-area-inset-bottom));background:linear-gradient(0deg,#07111f,#07111fcc);display:flex;gap:3px;align-items:stretch;z-index:2;border-top:1px solid #ffffff18;overflow:hidden}
+.tb{flex:1 1 0;min-width:0;overflow:hidden;background:linear-gradient(180deg,#1c2b42,#131f31);border:2px solid #ffffff14;border-radius:14px;color:#fff;padding:5px 0 3px;font-family:inherit;font-size:10px;line-height:1.35;cursor:pointer;transition:transform .08s}
 .tb:active{transform:scale(.94)}
 .tb b{display:block;font-size:20px}
 .tb .pr{color:#facc15;font-weight:800}
