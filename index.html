@@ -876,7 +876,10 @@ function healCast(){if(state!="play"||paused||healCd>0)return;healCd=45;lives+=3
 $("heal").onclick=healCast;
 $("ult").onclick=ultimate;
 let dome=null;window.__dome=()=>dome?dome.visible+" "+dome.position.toArray().map(x=>Math.round(x*10)/10):"none";
-function updateDome(dt){if(!dome){dome=new THREE.Mesh(new THREE.SphereGeometry(3.2,20,14),new THREE.MeshBasicMaterial({color:0xa78bfa,transparent:true,opacity:.2,depthWrite:false,side:2}));dome.visible=false;scene.add(dome)}
+let alarm=null;window.__alarm=()=>alarm?alarm.visible:"none";
+function updateAlarm(){if(!alarm){alarm=new THREE.Mesh(new THREE.RingGeometry(3.0,3.5,40),new THREE.MeshBasicMaterial({color:0xef4444,side:2,transparent:true,opacity:.7,depthWrite:false}));alarm.rotation.x=-Math.PI/2;alarm.visible=false;scene.add(alarm)}
+  alarm.visible=state=="play"&&ST&&lives>0&&lives<=ST.lives*.3&&!!castleP;if(alarm.visible){alarm.position.set(castleP.x,.15,castleP.z);const k=1+.12*Math.sin(performance.now()/160);alarm.scale.set(k,k,k);alarm.material.opacity=.45+.35*Math.sin(performance.now()/160)}}
+function updateDome(dt){updateAlarm();if(!dome){dome=new THREE.Mesh(new THREE.SphereGeometry(3.2,20,14),new THREE.MeshBasicMaterial({color:0xa78bfa,transparent:true,opacity:.2,depthWrite:false,side:2}));dome.visible=false;scene.add(dome)}
   dome.visible=shieldN>0&&state=="play";if(dome.visible&&castleP){dome.position.set(castleP.x,1.2,castleP.z);const k=1+.04*Math.sin(performance.now()/250);dome.scale.set(k,k,k);dome.material.opacity=.14+.06*shieldN/3}}
 function updateUlt(dt){updateDome(dt);shCd=Math.max(0,shCd-dt);{const h=$("shld");h.style.display=state=="play"?"block":"none";if(shCd>0){h.className="cd";h.innerHTML="<b>"+AR(Math.ceil(shCd))+"</b>ث"}else if(shieldN>0){h.className="";h.innerHTML="<b>🛡"+AR(shieldN)+"</b>شغال"}else{h.className="";h.innerHTML="<b>🛡</b>درع"}}healCd=Math.max(0,healCd-dt);{const h=$("heal");h.style.display=state=="play"?"block":"none";if(healCd>0){h.className="cd";h.innerHTML="<b>"+AR(Math.ceil(healCd))+"</b>ث"}else{h.className="";h.innerHTML="<b>💚</b>ترميم"}}ultCd=Math.max(0,ultCd-dt);const b=$("ult");b.style.display=state=="play"?"block":"none";
   if(ultCd>0){b.className="cd";b.innerHTML="<b>"+AR(Math.ceil(ultCd))+"</b>ث"}else{b.className="rdy";b.innerHTML="<b>🌀</b>عاصفة"}}
