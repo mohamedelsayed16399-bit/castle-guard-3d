@@ -602,7 +602,7 @@ function openPop(tw){
     tw.sellVal+=Math.round(nxt.cost*.7);burst(pos,0xfacc15,tw.lv==4?30:14);ringFx(pos,0xfacc15);if(tw.lv==4){setTimeout(()=>ringFx(pos,0xf472b6),180);floatText(pos,"✨ ماكس","#fde047")}else floatText(pos,"⬆ مستوى "+AR(tw.lv),"#fde047");closePop();hud();mkBar()};
   if(nxt&&gold<nxt.cost)$("pup").classList.add("dis");
   $("ptg").onclick=()=>{tw.mode=TARGET_MODES[(TARGET_MODES.indexOf(tw.mode)+1)%3];$("ptg").textContent="🎯 "+TMN[tw.mode]};
-  $("psl").onclick=()=>{gold+=tw.sellVal;sfx("sell");scene.remove(tw.m);towers=towers.filter(x=>x!=tw);
+  $("psl").onclick=()=>{gold+=tw.sellVal;sfx("sell");{const g=tw.m.clone(true);g.position.copy(tw.m.position);scene.add(g);scene.remove(tw.m);const b=g.scale.clone();let k=0;window.__shr=(window.__shr||0)+1;(function st(){k+=.1;g.scale.copy(b).multiplyScalar(Math.max(.01,1-k));g.rotation.y+=.3;if(k<1)requestAnimationFrame(st);else{scene.remove(g);window.__shrd=1}})()}towers=towers.filter(x=>x!=tw);
     const cell=cells.find(c=>c.userData.c==tw.c&&c.userData.r==tw.r);if(cell)cell.userData.taken=false;
     burst(pos,0x94a3b8,8);closePop();hud();mkBar();sellUndo(tw)};
 }
