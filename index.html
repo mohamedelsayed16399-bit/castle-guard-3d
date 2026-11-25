@@ -56,6 +56,8 @@ canvas{display:block;position:fixed;inset:0;touch-action:none}
 .btn.sm{padding:12px 30px;font-size:17px;background:linear-gradient(180deg,#334155,#1e293b);color:#fff;box-shadow:none}
 #stn{font-size:20px;color:#facc15;font-weight:900;min-height:28px}
 #pv{margin-top:6px;font-size:12px;color:#e2e8f0;text-align:center;text-shadow:0 1px 4px #000;min-height:16px}
+.atoast{position:fixed;top:64px;left:50%;transform:translate(-50%,-30px);background:#0b1730ee;border:2px solid #fbbf24;color:#fde68a;padding:10px 22px;border-radius:30px;font-weight:900;z-index:99;opacity:0;transition:.4s;pointer-events:none}.atoast.on{opacity:1;transform:translate(-50%,0)}
+#achl{text-align:right;max-height:55vh;overflow:auto;direction:rtl;line-height:2;font-size:15px}
 .mini{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
 .btn.xs{padding:10px 18px;font-size:15px;background:linear-gradient(180deg,#334155,#1e293b);color:#fff;box-shadow:none}
 .btn.xs.on{background:linear-gradient(180deg,#ef4444,#991b1b)}
@@ -90,7 +92,7 @@ canvas{display:block;position:fixed;inset:0;touch-action:none}
   <div id="stn"></div>
   <p class="hs" id="hsline"></p>
   <button class="btn" id="go">ابدأ اللعب</button>
-  <div class="mini"><button class="btn xs" id="endlessb">♾ لانهائي</button><button class="btn xs" id="hardb">🔥 صعب</button><button class="btn xs" id="shopb">💎 تحسينات</button></div>
+  <div class="mini"><button class="btn xs" id="endlessb">♾ لانهائي</button><button class="btn xs" id="hardb">🔥 صعب</button><button class="btn xs" id="shopb">💎 تحسينات</button><button class="btn xs" id="achb">🏅 إنجازات</button></div>
 </div>
 <div class="ov" id="end">
   <h1 id="et"></h1>
@@ -101,6 +103,7 @@ canvas{display:block;position:fixed;inset:0;touch-action:none}
   <button class="btn sm" id="tomenu">كل المراحل</button>
 </div>
 <div class="ov" id="shop"><h1>💎 تحسينات دائمة</h1><p id="gemline"></p><div id="shl" style="display:flex;flex-direction:column;gap:8px"></div><button class="btn sm" id="shback">رجوع</button></div>
+<div class="ov" id="ach"><h1>🏅 الإنجازات</h1><div id="achl"></div><p id="achs"></p><button class="btn sm" id="achx">رجوع</button></div><div class="atoast" id="atoast"></div>
 <div class="ov" id="pause"><h1>⏸ وقفة</h1><button class="btn" id="resume">كمّل</button><button class="btn sm" id="pmenu">كل المراحل</button></div>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
 <script type="module">
@@ -355,6 +358,15 @@ function enemyModel(t){
 let gold,lives,wave,kills,dmgDealt,goldEarned,state="menu",enemies=[],towers=[],shots=[],parts=[],floats=[],queue=[],spT=0,inWave=false,speedMul=1,popTarget=null,msgT=0,buildType=null,ghost=null,ring,bossAlive=false,paused=false;
 let abMeteor={cd:0,max:26},abFreeze={cd:0,max:32};
 const V3=THREE.Vector3;
+const ACHS=[["k100","حارس","اقتل 100 عدو",x=>x.kills>=100],["k1000","مدافع شرس","اقتل 1000 عدو",x=>x.kills>=1000],["k5000","جحيم الأسوار","اقتل 5000 عدو",x=>x.kills>=5000],["w1","أول نصر","اكسب مرحلة",x=>x.wins>=1],["w5","صدّ الهجمات","اكسب 5 مرات",x=>x.wins>=5],["camp","أسطورة","خلّص الحملة",x=>x.camp],["s3","نجوم","3 نجوم في مرحلة",x=>x.star3>=1],["s15","جامع النجوم","10 نجوم إجمالي",x=>x.stars>=10],["e15","صمود","موجة 15 في اللانهائي",x=>x.endw>=15],["e30","لا ينكسر","موجة 30 في اللانهائي",x=>x.endw>=30],["hd","شجاع","اكسب في الصعب",x=>x.hardwin>=1],["r10","مثابر","10 جولات",x=>x.runs>=10]];
+let XST={kills:0,wins:0,runs:0,camp:false,star3:0,stars:0,endw:0,hardwin:0},XAH={};
+try{XST=Object.assign(XST,JSON.parse(localStorage.getItem("cg3d_stats")))}catch(e){}
+try{XAH=JSON.parse(localStorage.getItem("cg3d_ach"))||{}}catch(e){}
+function chkAch(){try{localStorage.setItem("cg3d_stats",JSON.stringify(XST))}catch(e){}
+ for(const a of ACHS)if(!XAH[a[0]]&&a[3](XST)){XAH[a[0]]=1;try{localStorage.setItem("cg3d_ach",JSON.stringify(XAH))}catch(e){}
+  const t=$("atoast");t.textContent="🏅 إنجاز جديد: "+a[1];t.classList.add("on");clearTimeout(chkAch.t);chkAch.t=setTimeout(()=>t.classList.remove("on"),2600)}}
+function showAch(){$("achl").innerHTML=ACHS.map(a=>(XAH[a[0]]?"✅ ":"🔒 ")+"<b>"+a[1]+"</b> · "+a[2]).join("<br>");
+ $("achs").textContent="قتلى "+XST.kills+" · جولات "+XST.runs+" · انتصارات "+XST.wins+" · أعلى موجة لانهائي "+XST.endw;$("ach").classList.add("on");$("achx").onclick=()=>$("ach").classList.remove("on")}
 let endless=false,hard=localStorage.getItem("cg3d_hard")=="1",combo=0,lastKill=-9,slowmo=0,DMGM=1;
 const EMO={grunt:"💀",runner:"💨",brute:"👹",healer:"💚",shield:"🛡",flyer:"🦇",boss:"👑",titan:"🔥",splitter:"🧬",armored:"⚙",mini:"🐜"};
 function meta(){try{const m=JSON.parse(localStorage.getItem("cg3d_meta")||"null");if(m&&m.lv)return m}catch(e){}return{gems:0,lv:{gold:0,dmg:0,hp:0,abil:0}}}
@@ -613,7 +625,7 @@ function damage(e,amt,crit=false){
   if(e.hp<=0)kill(e);
 }
 function kill(e){
-  e.dead=true;kills++;gold+=e.d.gold;goldEarned+=e.d.gold;
+  e.dead=true;kills++;XST.kills++;if((XST.kills&7)==0)chkAch();gold+=e.d.gold;goldEarned+=e.d.gold;
   combo=(clockT-lastKill<2.2)?combo+1:1;lastKill=clockT;
   if(combo>=6&&combo%6==0){const b=combo;gold+=b;goldEarned+=b;floatText(e.m.position,"🔥x"+combo+" +"+b,"#fb923c")}
   if(e.d.splits){for(let i=0;i<2;i++){const c=spawnEnemy("mini");c.prog=Math.max(0,(e.prog||0)-.01*i);c.dist=e.dist;const p=curve.getPointAt(clamp(c.prog,0,1));c.m.position.set(p.x,0,p.z)}burst(e.m.position,0xf97316,12,5)}
@@ -837,14 +849,16 @@ function renderStages(){
 }
 function toMenu(){state="menu";paused=false;$("end").classList.remove("on");$("pause").classList.remove("on");renderStages();$("start").classList.add("on")}
 function gameOver(win){
-  state="over";saveHs();
+  state="over";saveHs();XST.runs++;XST.kills+=0;
+  if(win&&!endless){XST.wins++;if(hard)XST.hardwin++;if(stageIdx==4)XST.camp=true}
+  if(endless)XST.endw=Math.max(XST.endw,wave);
   const h=hs();
   let st=0,unlockedNext=false;
   if(win&&!endless){
     st=lives>=ST.lives*.75?3:lives>=ST.lives*.4?2:1;
     const c=camp();c.s[stageIdx]=Math.max(c.s[stageIdx]||0,st);
     if(stageIdx<4&&c.u<stageIdx+1){c.u=stageIdx+1;unlockedNext=true}
-    saveCamp(c);
+    saveCamp(c);XST.stars=c.s.reduce((a,b)=>a+b,0);XST.star3=c.s.filter(v=>v>=3).length;
   }
   $("et").textContent=win?(stageIdx==4?"🏆 خلصت الحملة! حارس أسطوري":"🏆 المرحلة اتحلت!"):"💔 وقعت القلعة…";
   $("est").innerHTML="<div><b>"+AR(wave)+"</b>موجة</div><div><b>"+AR(kills)+"</b>قتلة</div><div><b>"+AR(dmgDealt)+"</b>ضرر</div><div><b>"+AR(goldEarned)+"</b>ذهب</div>";
@@ -852,10 +866,12 @@ function gameOver(win){
   {let gems=win?(5+stageIdx*3+st*2):Math.floor(wave/2);if(endless)gems=Math.floor(wave*1.2);if(hard)gems=Math.ceil(gems*1.5);
    const m=meta();m.gems+=gems;saveMeta(m);$("ep").innerHTML+="<br>💎 +"+AR(gems)+" جوهرة"+(hard?" (صعب ×١.٥)":"");
    if(endless){const b=+localStorage.getItem("cg3d_end")||0;if(wave>b){localStorage.setItem("cg3d_end",wave);$("ep").innerHTML+="<br>🏅 رقم قياسي جديد في اللانهائي!"}}}
+  chkAch();
   $("nxt").style.display=(win&&stageIdx<4&&!endless)?"":"none";
   $("end").classList.add("on");
   sfx(win?"win":"lose");
 }
+$("achb").onclick=showAch;
 $("go").onclick=()=>{audio();endless=false;const c=camp();newGame(Math.min(c.u,4))};
 $("endlessb").onclick=()=>{audio();endless=true;const c=camp();newGame(Math.min(c.u,4))};
 function syncHard(){$("hardb").className="btn xs"+(hard?" on":"");$("hardb").textContent=hard?"🔥 صعب: شغال":"🔥 صعب"}
@@ -920,7 +936,7 @@ buildMap();renderStages();
 document.addEventListener("visibilitychange",()=>{if(document.hidden&&state=="play"&&!paused){paused=true;$("pause").classList.add("on")}});
 addEventListener("keydown",e=>{if(e.key=="Escape"||e.key=="p"||e.key=="P"){if(state=="play"){paused=!paused;$("pause").classList.toggle("on",paused)}}});
 window.__endless=v=>{endless=v};window.__w=()=>({enemiesTypes:enemies.map(e=>e.t),weather:!!weather,meta:meta()});
-window.__win=()=>gameOver(true);
+window.__win=()=>gameOver(true);window.__cs=()=>({XST,XAH,chkAch,showAch});
 window.__g=()=>({state,wave,lives,gold,kills,en:enemies.filter(e=>!e.dead).length,tw:towers.length,q:queue.length,inWave,parts:parts.length,shots:shots.length});
 window.__tap=(c,r)=>{const cell=cells.find(x=>x.userData.c==c&&x.userData.r==r);if(buildType){tryBuild(c,r);buildType=null;mkBar()}return !!cell};
 window.__setBuild=k=>{buildType=k};
@@ -933,5 +949,6 @@ window.__towers=()=>towers.map(t=>({type:t.type,lv:t.lv,c:t.c,r:t.r}));
 </script>
 </body>
 </html>
+
 
 
