@@ -667,8 +667,8 @@ let wk0=0;function startWave(auto){wk0=kills;
   mod=null;
   {const isBoss=queue.some(t=>EN[t].boss);
    if(wave>=3&&!isBoss&&wave<WMAX&&Math.random()<.45){
-    const M=[{k:"fog",n:"🌫 ضباب: مدى الأبراج -٢٠٪",range:.8},{k:"storm",n:"💨 عاصفة: الأعداء أسرع ٢٥٪",spd:1.25},{k:"loot",n:"💰 موجة غنيمة: الذهب ×٢",gold:2},{k:"horde",n:"🧟 حشد: أعداد أكتر ٤٠٪"}];
-    mod=M[Math.floor(Math.random()*M.length)];
+    const M=[{k:"fog",n:"🌫 ضباب: مدى الأبراج -٢٠٪",range:.8},{k:"storm",n:"💨 عاصفة: الأعداء أسرع ٢٥٪",spd:1.25},{k:"loot",n:"💰 موجة غنيمة: الذهب ×٢",gold:2},{k:"horde",n:"🧟 حشد: أعداد أكتر ٤٠٪"},{k:"royal",n:"👑 موجة ملكية: الذهب ×٣ والأعداء أسرع ١٠٪",gold:3,spd:1.1}];
+    mod=M[window.__fm!==undefined?window.__fm:Math.floor(Math.random()*M.length)];window.__modk=mod.k;
     if(mod.k=="horde"){const ex=queue.filter(t=>!EN[t].boss).slice(0,Math.floor(queue.length*.4));queue=queue.concat(ex)}
     bannerShow(mod.n,3200);}}
   {const mb=$("modb");if(mod){mb.textContent=mod.n;mb.style.display="block"}else mb.style.display="none"}
