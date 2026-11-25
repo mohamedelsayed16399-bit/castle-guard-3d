@@ -496,9 +496,9 @@ function bossBar(){let b=null;for(const e of enemies)if(!e.dead&&e.d.boss&&e.del
  el.style.display="block";$("bbn").textContent="💀 "+b.d.name;const f=Math.max(0,b.hp/b.max);const x=$("bbf");x.style.width=(f*100)+"%";x.style.background=f<.5?"linear-gradient(90deg,#a855f7,#ef4444)":"linear-gradient(90deg,#ef4444,#f97316)"}
 function waveSplash(n){const f=$("wsplash");f.textContent="⚔ موجة "+AR(n)+(n>=WMAX&&!endless?" 👑":"");f.style.transition="none";f.style.opacity=1;f.style.transform="scale(1.5)";void f.offsetWidth;f.style.transition="opacity 1.1s ease-in .5s,transform .5s";f.style.opacity=0;f.style.transform="scale(1)";window.__ws=(window.__ws||0)+1}
 function leakFlash(){const f=$("leakfx");f.style.transition="none";f.style.opacity=1;void f.offsetWidth;f.style.transition="opacity .6s";f.style.opacity=0;window.__lf=(window.__lf||0)+1}
-let livesW=0,perfS=0,duskT=0,duskC=0;const SUNA=new THREE.Color(0xfff3d6),SUNB=new THREE.Color(0xff9a52);
+let lastTw=null,livesW=0,perfS=0,duskT=0,duskC=0;const SUNA=new THREE.Color(0xfff3d6),SUNB=new THREE.Color(0xff9a52);
 function duskTick(dt){{const lo=lives>0&&lives<=ST.lives*.3;const lf=$("lowfx");if(lo!=(lf.style.display=="block"))lf.style.display=lo?"block":"none"}duskC+=(duskT-duskC)*Math.min(1,dt*.8);hemi.intensity=1.05*(1-.3*duskC);sun.intensity=2.1*(1-.2*duskC);sun.color.copy(SUNA).lerp(SUNB,duskC*.8)}
-function comboTick(dt){duskTick(dt);if(comboN>0){comboT-=dt;if(comboT<=0){comboN=0;$("combo").style.opacity=0}}}
+function comboTick(dt){lastTw=null;duskTick(dt);if(comboN>0){comboT-=dt;if(comboT<=0){comboN=0;$("combo").style.opacity=0}}}
 function bannerShow(t,ms=2600){const b=$("banner");b.textContent=t;b.classList.add("on");clearTimeout(b._t);b._t=setTimeout(()=>b.classList.remove("on"),ms)}
 function say(t,ms=1800){const m=$("msg");m.textContent=t;m.style.opacity=1;msgT=ms/1000}
 function hud(){
@@ -552,7 +552,7 @@ function openPop(tw){
   const t=TW[tw.type],lv=tw.lv,cur=t.lv[lv-1],nxt=lv<4?t.lv[lv]:null;
   const p=$("pop");
   const up=nxt?'<button class="up" id="pup">⬆ ترقية '+AR(nxt.cost)+'</button>':"";
-  p.innerHTML='<div class="pi">'+t.ic+" "+t.n+"<br>مستوى "+AR(lv)+(lv==4?" (ماكس)":"")+"<br>ضرر "+AR(cur.dmg)+" • مدى "+AR(cur.range)+(lv==4?"<br>✨ "+({archer:"سهمين في نفس الوقت",cannon:"أقوى مدفع",frost:"نبضة تجميد كل ٧ ثواني",sniper:"٤٠٪ ضربة حرجة ×٢",tesla:"برق أطول",mortar:"أقوى هاون"}[tw.type]):"")+(()=>{const y=synergy(tw);return y.n?"<br>🤝 تحالف +"+AR(Math.round((y.m-1)*100))+"٪":"<br><small>🤝 حطه جنب أبراج مختلفة +٨٪ لكل نوع</small>"})()+"</div>"
+  p.innerHTML='<div class="pi">'+t.ic+" "+t.n+"<br>مستوى "+AR(lv)+(lv==4?" (ماكس)":"")+"<br>ضرر "+AR(cur.dmg)+" • مدى "+AR(cur.range)+"<br>☠ قتل "+AR(tw.kills||0)+(lv==4?"<br>✨ "+({archer:"سهمين في نفس الوقت",cannon:"أقوى مدفع",frost:"نبضة تجميد كل ٧ ثواني",sniper:"٤٠٪ ضربة حرجة ×٢",tesla:"برق أطول",mortar:"أقوى هاون"}[tw.type]):"")+(()=>{const y=synergy(tw);return y.n?"<br>🤝 تحالف +"+AR(Math.round((y.m-1)*100))+"٪":"<br><small>🤝 حطه جنب أبراج مختلفة +٨٪ لكل نوع</small>"})()+"</div>"
     +up
     +'<button id="ptg">🎯 '+TMN[tw.mode]+'</button>'
     +'<button class="sell" id="psl">💰 بيع '+AR(tw.sellVal)+'</button>';
@@ -672,7 +672,7 @@ function chainZap(from,e,dmg,chain){
   }
 }
 function damage(e,amt,crit=false){
-  if(e.dead)return;
+  if(e.dead)return;if(lastTw)e.by=lastTw;
   amt*=DMGM*perk.dmg;
   if(e.slowT>0)amt*=1.25;
   if(e.d.armor&&amt<22)amt*=.45;
@@ -686,7 +686,7 @@ function damage(e,amt,crit=false){
   if(e.hp<=0)kill(e);
 }
 function kill(e){
-  e.dead=true;kills++;XST.kills++;comboHit();if((XST.kills&7)==0)chkAch();{const g0=Math.round(e.d.gold*perk.gold*(mod&&mod.gold||1));gold+=g0;goldEarned+=g0;floatText(e.m.position,"+"+g0,e.d.boss?"#f472b6":"#fde047")}
+  if(e.by&&towers.includes(e.by))e.by.kills=(e.by.kills||0)+1;e.dead=true;kills++;XST.kills++;comboHit();if((XST.kills&7)==0)chkAch();{const g0=Math.round(e.d.gold*perk.gold*(mod&&mod.gold||1));gold+=g0;goldEarned+=g0;floatText(e.m.position,"+"+g0,e.d.boss?"#f472b6":"#fde047")}
   combo=(clockT-lastKill<2.2)?combo+1:1;lastKill=clockT;
   if(combo>=6&&combo%6==0){const b=combo;gold+=b;goldEarned+=b;floatText(e.m.position,"🔥x"+combo+" +"+b,"#fb923c")}
   if(e.d.splits){for(let i=0;i<2;i++){const c=spawnEnemy("mini");c.prog=Math.max(0,(e.prog||0)-.01*i);c.dist=e.dist;const p=curve.getPointAt(clamp(c.prog,0,1));c.m.position.set(p.x,0,p.z)}burst(e.m.position,0xf97316,12,5)}
@@ -746,7 +746,7 @@ function fireTower(tw,dt){
     const g=new THREE.BufferGeometry().setFromPoints([from,best.m.position.clone().setY(best.m.position.y+.5)]);
     const line=new THREE.Line(g,new THREE.LineBasicMaterial({color:0xe879f9,transparent:true}));
     scene.add(line);parts.push({m:line,v:null,l:.12,tl:.12,line:true});
-    burst(best.m.position,t.col,4,2);{const cr=Math.random()<(tw.lv==4?.4:.15);damage(best,cur.dmg*SM*(cr&&tw.lv==4?2:1),cr);if(cr&&tw.lv==4)floatText(best.m.position,"💥","#f472b6")}
+    burst(best.m.position,t.col,4,2);lastTw=tw;{const cr=Math.random()<(tw.lv==4?.4:.15);damage(best,cur.dmg*SM*(cr&&tw.lv==4?2:1),cr);if(cr&&tw.lv==4)floatText(best.m.position,"💥","#f472b6")}
     return;
   }
   // projectiles
@@ -754,9 +754,9 @@ function fireTower(tw,dt){
   const geo=arch?new THREE.ConeGeometry(.07,.4,5):frost?new THREE.IcosahedronGeometry(.16):mort?new THREE.SphereGeometry(.28,8,6):new THREE.SphereGeometry(.2,8,6);
   const m=new THREE.Mesh(geo,new THREE.MeshBasicMaterial({color:frost?0x7dd3fc:mort?0xfb7185:arch?0xd9f99d:0xffa726}));
   m.position.copy(from);scene.add(m);
-  shots.push({kind:mort?"arc":arch?"dart":frost?"bolt":"shell",m,target:best,src:from.clone(),t:0,dur:arch?.35:mort?.9:frost?.4:.5,dmg:cur.dmg*SM,tw:tw.type,cur});
+  shots.push({kind:mort?"arc":arch?"dart":frost?"bolt":"shell",m,target:best,src:from.clone(),t:0,dur:arch?.35:mort?.9:frost?.4:.5,dmg:cur.dmg*SM,tw:tw.type,cur,twr:tw});
   if(arch&&tw.lv==4){let b2=null,k2=1e9;for(const e of enemies){if(e===best||e.dead||e.delay>0)continue;const d=e.m.position.distanceTo(tw.m.position);if(d>cur.range*perk.range*(mod&&mod.range||1)*(bliz>0?.75:1))continue;if(-e.dist<k2){k2=-e.dist;b2=e}}
-    if(b2){const m2=new THREE.Mesh(geo,new THREE.MeshBasicMaterial({color:0xfde68a}));m2.position.copy(from);scene.add(m2);shots.push({kind:"dart",m:m2,target:b2,src:from.clone(),t:0,dur:.35,dmg:cur.dmg*SM,tw:tw.type,cur})}}
+    if(b2){const m2=new THREE.Mesh(geo,new THREE.MeshBasicMaterial({color:0xfde68a}));m2.position.copy(from);scene.add(m2);shots.push({kind:"dart",m:m2,target:b2,src:from.clone(),t:0,dur:.35,dmg:cur.dmg*SM,tw:tw.type,cur,twr:tw})}}
   burst(from,frost?0x7dd3fc:arch?0xd9f99d:0xffb347,3,2);
   sfx(arch?"arrow":mort?"boom":"shoot",.6);
 }
@@ -932,11 +932,11 @@ function updateShots(dt){
       s.done=true;scene.remove(s.m);
       if(s.kind=="dart"||s.kind=="bolt"){
         if(tgt&&!tgt.dead){
-          damage(tgt,s.dmg);
+          lastTw=s.twr;damage(tgt,s.dmg);lastTw=null;
           if(s.tw=="frost"){tgt.slow=Math.max(tgt.slow,s.cur.slow);tgt.slowT=Math.max(tgt.slowT,s.cur.slowT);burst(tp,0x7dd3fc,3,2)}
         }
       }else{ // shell / mortar splash
-        explodeAt(tp,s.cur.splash,s.dmg);
+        lastTw=s.twr;explodeAt(tp,s.cur.splash,s.dmg);lastTw=null;
         if(s.tw=="mortar")for(const e of enemies){if(!e.dead&&e.m.position.distanceTo(tp)<=s.cur.splash)e.stun=Math.max(e.stun,s.cur.stun)}
       }
     }
@@ -1177,7 +1177,7 @@ window.__enemies=()=>enemies.slice(0,3).map(e=>({t:e.t,prog:e.prog,delay:e.delay
 window.__pathlen=PATHLEN;
 window.__cellScreen=(c,r)=>{const p=cellPos(c,r).clone().project(cam);return{x:(p.x+1)/2*innerWidth,y:(-p.y+1)/2*innerHeight}};
 window.__set=(k,v)=>{if(k=='wave')wave=v;else if(k=='gold')gold=v;else if(k=='lives')lives=v;else if(k=='speed')speedMul=v;hud()};
-window.__startWave=startWave;window.__hero=()=>({pos:hero&&hero.position.toArray(),target:heroTarget&&heroTarget.toArray(),names:hero&&hero.userData.names,cur:hero&&hero.userData.cur,perk});window.__perk=offerPerk;window.__upgT=()=>{const tw=towers[0];if(!tw)return "none";openPop(tw);$("pup").click();return tw.lv+"/"+(window.__rings||0)};window.__low=()=>({d:$("lowfx").style.display,lives,max:ST.lives});window.__parts=()=>parts.length;window.__perf=()=>({perfS,livesW,lives});window.__dusk=()=>({duskT,duskC,h:hemi.intensity,s:sun.intensity,c:sun.color.getHexString()});window.__floats=()=>floats.length;window.__estat=()=>$("est").textContent;window.__bbar=()=>({d:$("bbar").style.display,n:$("bbn").textContent,w:$("bbf").style.width});window.__combo=()=>({comboN,comboBest,op:$("combo").style.opacity,txt:$("combo").textContent,gold});window.__music=()=>({musicOn,mStep,ac:AC&&AC.state});window.__setStage2=i=>{endless=false;newGame(i)};window.__gems=n=>{const m=meta();m.gems+=n;saveMeta(m)};window.__bliz=n=>{bliz=n};window.__hz=()=>{hzT=0};window.__hzs=()=>({warn:hzWarn.length,bliz,dis:towers.map(t=>t.dis||0)});window.__setStage=i=>{endless=false;newGame(i)};window.__heal=healCast;window.__heal0=()=>{healCd=0};window.__upg=(i,lv)=>{const t=towers[i];if(t){scene.remove(t.m);t.lv=lv;t.m=towerModel(t.type,lv);t.m.position.copy(cellPos(t.c,t.r));scene.add(t.m)}};window.__chest=spawnChest;window.__chests=()=>chests.length;window.__chestc=()=>chests.map(k=>[k.c,k.r]);window.__stage=i=>{endless=false;newGame(i)};window.__hl=()=>({heroLv,heroXp});window.__spawn=(t)=>{spawnEnemy(t)};window.__gain=heroGain;window.__dmg=(t,a)=>{const e=enemies.find(x=>x.t==t&&!x.dead);if(e)damage(e,a)};window.__ult=ultimate;window.__mod=()=>mod;window.__light=()=>({h:hemi.intensity,s:sun.intensity});window.__tapxy=null;window.__cam=cam;window.__look=camLook;window.__base=camBase;
+window.__startWave=startWave;window.__hero=()=>({pos:hero&&hero.position.toArray(),target:heroTarget&&heroTarget.toArray(),names:hero&&hero.userData.names,cur:hero&&hero.userData.cur,perk});window.__perk=offerPerk;window.__tk=()=>towers.map(t=>t.kills||0);window.__popT=()=>{openPop(towers[0]);return document.querySelector('#pop .pi').textContent};window.__upgT=()=>{const tw=towers[0];if(!tw)return "none";openPop(tw);$("pup").click();return tw.lv+"/"+(window.__rings||0)};window.__low=()=>({d:$("lowfx").style.display,lives,max:ST.lives});window.__parts=()=>parts.length;window.__perf=()=>({perfS,livesW,lives});window.__dusk=()=>({duskT,duskC,h:hemi.intensity,s:sun.intensity,c:sun.color.getHexString()});window.__floats=()=>floats.length;window.__estat=()=>$("est").textContent;window.__bbar=()=>({d:$("bbar").style.display,n:$("bbn").textContent,w:$("bbf").style.width});window.__combo=()=>({comboN,comboBest,op:$("combo").style.opacity,txt:$("combo").textContent,gold});window.__music=()=>({musicOn,mStep,ac:AC&&AC.state});window.__setStage2=i=>{endless=false;newGame(i)};window.__gems=n=>{const m=meta();m.gems+=n;saveMeta(m)};window.__bliz=n=>{bliz=n};window.__hz=()=>{hzT=0};window.__hzs=()=>({warn:hzWarn.length,bliz,dis:towers.map(t=>t.dis||0)});window.__setStage=i=>{endless=false;newGame(i)};window.__heal=healCast;window.__heal0=()=>{healCd=0};window.__upg=(i,lv)=>{const t=towers[i];if(t){scene.remove(t.m);t.lv=lv;t.m=towerModel(t.type,lv);t.m.position.copy(cellPos(t.c,t.r));scene.add(t.m)}};window.__chest=spawnChest;window.__chests=()=>chests.length;window.__chestc=()=>chests.map(k=>[k.c,k.r]);window.__stage=i=>{endless=false;newGame(i)};window.__hl=()=>({heroLv,heroXp});window.__spawn=(t)=>{spawnEnemy(t)};window.__gain=heroGain;window.__dmg=(t,a)=>{const e=enemies.find(x=>x.t==t&&!x.dead);if(e)damage(e,a)};window.__ult=ultimate;window.__mod=()=>mod;window.__light=()=>({h:hemi.intensity,s:sun.intensity});window.__tapxy=null;window.__cam=cam;window.__look=camLook;window.__base=camBase;
 window.__towers=()=>towers.map(t=>({type:t.type,lv:t.lv,c:t.c,r:t.r}));
 </script>
 </body>
