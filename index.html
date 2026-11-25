@@ -184,7 +184,8 @@ const STAGES=[
  {n:"الصحرا",ic:"🏜️",path:[[0,1],[4,1],[4,3],[8,3],[8,5],[0,5],[0,7],[8,7],[8,9],[2,9],[2,12],[8,12]],waves:15,hp:1.2,gold:220,lives:20,theme:{ground:0xc9a35e,fog:0xe8c98f,g1:0xd8b46c,g2:0xcca65e,road:0x9b7a45,road2:0xb89558,tuft:0x9a8a3a}},
  {n:"قمة التلج",ic:"❄️",path:[[0,1],[6,1],[6,3],[2,3],[2,5],[6,5],[6,7],[2,7],[2,9],[6,9],[6,11],[8,11],[8,12]],waves:15,hp:1.45,gold:210,lives:18,theme:{ground:0xdfe9f2,fog:0xbcd2e6,g1:0xe6eef6,g2:0xdde8f2,road:0x7c6a55,road2:0xa9b3c2,tuft:0xaec4d8}},
  {n:"جبل النار",ic:"🌋",path:[[0,1],[8,1],[8,3],[0,3],[0,5],[8,5],[8,7],[0,7],[0,9],[8,9],[8,12]],waves:18,hp:1.9,gold:240,lives:15,theme:{ground:0x3a2a2a,fog:0x6b3a2e,g1:0x5a3a34,g2:0x4d3029,road:0x2a1d1a,road2:0x5a3a2a,tuft:0xb0451f}},
- {n:"المدينة المسحورة",ic:"🔮",path:[[0,1],[8,1],[8,3],[1,3],[1,5],[7,5],[7,7],[2,7],[2,9],[6,9],[6,11],[8,11],[8,12]],waves:20,hp:2.3,gold:250,lives:12,theme:{ground:0x2a2144,fog:0x3b2a63,g1:0x4b3a78,g2:0x40316b,road:0x4a3a78,road2:0x8f7cc4,tuft:0x8b5cf6}}
+ {n:"المدينة المسحورة",ic:"🔮",path:[[0,1],[8,1],[8,3],[1,3],[1,5],[7,5],[7,7],[2,7],[2,9],[6,9],[6,11],[8,11],[8,12]],waves:20,hp:2.3,gold:250,lives:12,theme:{ground:0x2a2144,fog:0x3b2a63,g1:0x4b3a78,g2:0x40316b,road:0x4a3a78,road2:0x8f7cc4,tuft:0x8b5cf6}},
+ {n:"المعبد الذهبي",ic:"🏛️",path:[[0,1],[8,1],[8,4],[0,4],[0,6],[6,6],[6,8],[2,8],[2,10],[8,10],[8,12]],waves:20,hp:2.8,gold:260,lives:12,theme:{ground:0x7a6a3a,fog:0xe6c565,g1:0x8f7c3f,g2:0x846f36,road:0x3b2f1a,road2:0xd4af37,tuft:0xf5d36b}}
 ];
 let ST=STAGES[0],stageIdx=0,WMAX=10;
 let PATH,pathCells,curve,PATHLEN;
@@ -487,7 +488,7 @@ function waveComp(w0){
   else if(w==13){push("flyer",14);push("brute",6);push("healer",3)}
   else if(w==14){push("dragon",1);push("brute",8);push("shield",8);push("healer",5);push("runner",10)}
   else if(w==15){push("titan",1);push("boss",1);push("healer",4);push("flyer",8);push("brute",6)}
-  if(stageIdx==5&&(w==11||w==15))push("ghostking",1);
+  if((stageIdx==5||stageIdx==6)&&(w==11||w==15))push("ghostking",1);
   if(w>=6&&w!=8&&w!=15)push("berserker",Math.floor((w-4)/2));
   if(w>=9&&w!=8&&w!=15)push("wraith",Math.floor((w-6)/2));
   if(w>=5&&w!=8&&w!=15)push("armored",Math.floor((w-3)/2));
@@ -1092,7 +1093,7 @@ function newGame(si){
     setTimeout(()=>bannerShow("1️⃣ اختار برج من تحت ودوس على أرض خضرا",3500),1200);setTimeout(()=>bannerShow("2️⃣ دوس 🌊 موجة عشان تبدأ، والأعداء يمشوا في الطريق",3500),5200);setTimeout(()=>bannerShow("3️⃣ دوس على البرج عشان تطوّره، وعلى فاضي عشان تحرّك البطل",3800),9200)}
   bannerShow(endless?"♾ لانهائي: "+ST.n:"المرحلة "+AR(stageIdx+1)+": "+ST.n+" ، "+AR(WMAX)+" موجة"+(hard?" 🔥":""),3200);
 }
-function camp(){try{const c=JSON.parse(localStorage.getItem("cg3d_camp")||"null");if(c&&c.s){while(c.s.length<STAGES.length)c.s.push(0);if(c.s[4]>0&&c.u<5)c.u=5;return c}}catch(e){}return{u:0,s:[0,0,0,0,0,0]}}
+function camp(){try{const c=JSON.parse(localStorage.getItem("cg3d_camp")||"null");if(c&&c.s){while(c.s.length<STAGES.length)c.s.push(0);if(c.s[4]>0&&c.u<5)c.u=5;if(c.s[5]>0&&c.u<6)c.u=6;return c}}catch(e){}return{u:0,s:[0,0,0,0,0,0]}}
 function saveCamp(c){try{localStorage.setItem("cg3d_camp",JSON.stringify(c))}catch(e){}}
 function rkGet(){try{return JSON.parse(localStorage.getItem("cg3d_rk")||"{}")}catch(e){return{}}}
 function bwGet(){try{return JSON.parse(localStorage.getItem("cg3d_bw")||"{}")}catch(e){return{}}}
@@ -1114,7 +1115,7 @@ function renderStages(){
 function toMenu(){state="menu";$("heal").style.display="none";$("ult").style.display="none";$("modb").style.display="none";paused=false;perkOpen=false;$("perk").classList.remove("on");$("end").classList.remove("on");$("pause").classList.remove("on");renderStages();$("start").classList.add("on")}
 function gameOver(win){
   state="over";$("heal").style.display="none";$("ult").style.display="none";$("modb").style.display="none";saveHs();XST.runs++;if(!endless){try{const b=bwGet();b[stageIdx]=Math.max(b[stageIdx]||0,win?WMAX:wave);localStorage.setItem("cg3d_bw",JSON.stringify(b))}catch(e){}}XST.kills+=0;
-  if(win&&!endless){XST.wins++;if(hard)XST.hardwin++;if(stageIdx==STAGES.length-1)XST.camp=true}
+  if(win&&!endless){XST.wins++;if(hard)XST.hardwin++;if(stageIdx==5)XST.camp=true}
   if(endless)XST.endw=Math.max(XST.endw,wave);
   const h=hs();
   let st=0,unlockedNext=false;
