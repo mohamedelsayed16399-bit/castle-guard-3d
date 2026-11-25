@@ -628,7 +628,9 @@ function tryBuild(c,r){
   const m=towerModel(buildType,1);const p=cellPos(c,r);m.position.copy(p);m.userData.grow=0;m.scale.setScalar(.05);scene.add(m);
   towers.push({type:buildType,lv:1,m,c,r,cd:0,mode:"first",sellVal:Math.round(t.lv[0].cost*.7),spent:t.lv[0].cost});
   cell.userData.taken=true;
-  burst(p,0xffffff,8);ringFx(p,0x93c5fd);hud();mkBar();return true;
+  burst(p,0xffffff,8);ringFx(p,0x93c5fd);hud();mkBar();
+  {const base=m.scale.clone();let k=0;window.__drop=(window.__drop||0)+1;(function st(){k+=.06;const u=Math.min(1,k),c1=1.70158,c3=c1+1,e=1+c3*Math.pow(u-1,3)+c1*Math.pow(u-1,2);m.scale.copy(base).multiplyScalar(Math.max(.05,e));window.__dsc=m.scale.x/base.x;if(u<1)requestAnimationFrame(st);else m.scale.copy(base)})()}
+  return true;
 }
 // ---------- input ----------
 const ray=new THREE.Raycaster(),ptr=new THREE.Vector2();
