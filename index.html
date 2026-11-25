@@ -478,7 +478,7 @@ function spawnEnemy(t,delay=0){
   fg.position.z=.001;const stb=new THREE.Mesh(new THREE.PlaneGeometry(1.3,.07),new THREE.MeshBasicMaterial({color:0x38bdf8,depthWrite:false}));stb.position.set(0,-.12,.001);stb.visible=false;hbG.add(bg,fg,stb);scene.add(hbG);
   const e={m,mx:m.userData.mixer,hbG,fg,stb,t,hp:hpm,max:hpm,spd:d.spd,dist:0,slow:0,slowT:0,stun:0,d,delay,delayT:delay,bob:Math.random()*6,healT:0,dead:false};
   enemies.push(e);
-  if(d.boss){bossAlive=true;sfx("boss");bannerShow("⚠ "+d.name+" قادم!");bossWarn();shake=Math.max(shake,.5)}
+  if(d.boss){bossAlive=true;sfx("boss");bannerShow("⚠ "+d.name+" قادم!");bossWarn();if(t=="voidlord"){const P0=cellPos(PATH[0][0],PATH[0][1]);for(let k=0;k<3;k++)setTimeout(()=>{ringFx(P0,k==1?0xe11d48:0xe879f9)},k*350);burst(P0,0xc026d3,40,10);window.__rift=1}shake=Math.max(shake,.5)}
   return e;
 }
 // waves: 15, composition via generator
@@ -811,6 +811,8 @@ function fireTower(tw,dt){
     const ln=new THREE.Line(lg,new THREE.LineBasicMaterial({color:tw.rmp>=20?0xfef08a:0x22d3ee,transparent:true}));
     scene.add(ln);parts.push({m:ln,v:null,l:.1,tl:.1,line:true});
     lastTw=tw;damage(best,cur.dmg*SM*(1+tw.rmp*.1),false);
+    if(tw.lv==4){let b2=null,k2=-1e9;for(const e of enemies){if(e===best||e.dead||e.delay>0)continue;if(e.d.fly&&!t.canFly)continue;if(e.m.position.distanceTo(tw.m.position)>cur.range*perk.range)continue;if(e.dist>k2){k2=e.dist;b2=e}}
+      if(b2){const g2=new THREE.BufferGeometry().setFromPoints([from,b2.m.position.clone().setY(b2.m.position.y+.6)]);const l2=new THREE.Line(g2,new THREE.LineBasicMaterial({color:0xfef08a,transparent:true}));scene.add(l2);parts.push({m:l2,v:null,l:.1,tl:.1,line:true});damage(b2,cur.dmg*SM*.5,false);window.__lz2=(window.__lz2||0)+1}}
     if(tw.rmp%5==0){burst(best.m.position,0x67e8f9,2,2);sfx("shoot",.25)}
     window.__lz=tw.rmp;return}
   if(tw.type=="tesla"){chainZap(from,best,cur.dmg*SM,cur.chain);return}
@@ -954,7 +956,7 @@ function updateEnemies(dt){
   for(const e of enemies){
     if(e.dead)continue;
     flashTick(e,dt);
-    if(e.t=="voidlord"&&e.delay<=0&&!(e.stun>0)){if(e.bk==null)e.bk=5;e.bk-=dt;if(e.bk<=0){e.bk=7;burst(e.m.position,0xe11d48,22,8);e.prog+=.035;e.dist+=2.1;floatText(e.m.position,"🌀 وميض","#e879f9");window.__blink=(window.__blink||0)+1}}
+    if(e.t=="voidlord"&&e.delay<=0&&!(e.stun>0)){if(e.bk==null)e.bk=5;e.bk-=dt;if(e.bk<=0){e.bk=e.hp<e.max*.5?4:7;burst(e.m.position,0xe11d48,22,8);e.prog+=.035;e.dist+=2.1;floatText(e.m.position,"🌀 وميض","#e879f9");window.__blink=(window.__blink||0)+1}}
     if(e.t=="pharaoh"&&e.hp<e.max){e.hp=Math.min(e.max,e.hp+e.max*.012*dt);e.fg.scale.x=clamp(e.hp/e.max,0,1);e.fg.position.x=-(1-e.fg.scale.x)*.63;window.__preg=1}
     {const sk=e.pois?1:e.slowT>0?2:e.stun>0?3:0;if(e.stk!==sk){e.stk=sk;e.stb.visible=sk>0;if(sk)e.stb.material.color.setHex(sk==1?0x34d399:sk==2?0x38bdf8:0xfacc15);window.__stk=sk}}
     if(e.pois){e.pois.t-=dt;e.pois.acc+=dt;if(e.pois.acc>=.5){e.pois.acc-=.5;burst(e.m.position,0x34d399,2,2);damage(e,e.pois.dps*.5);window.__pdmg=(window.__pdmg||0)+1;if(e.dead)continue}if(e.pois.t<=0)e.pois=null}
