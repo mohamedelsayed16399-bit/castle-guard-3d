@@ -659,7 +659,7 @@ renderer.domElement.addEventListener("pointerup",ev=>{setTimeout(()=>{if(!buildT
 });
 // ---------- waves ----------
 let lastEnd=0;
-function startWave(auto){
+let wk0=0;function startWave(auto){wk0=kills;
   if(inWave||state!="play"||paused)return;
   if(auto!==true&&wave>0&&performance.now()-lastEnd<5000){const bn=8+wave*3;gold+=bn;goldEarned+=bn;sfx("coin");setTimeout(()=>bannerShow("⚡ موجة سريعة! +"+AR(bn)+" 💰",1800),300);window.__fast=(window.__fast||0)+bn}
   livesW=lives;wave++;waveSplash(wave);duskT=Math.min(1,wave/Math.max(8,WMAX));inWave=true;queue=waveComp(wave);
@@ -1070,7 +1070,7 @@ function waveDoneCheck(){
     inWave=false;lastEnd=performance.now();mod=null;$("modb").style.display="none";
     if(endless&&wave%10==0){const m=meta();m.gems+=3+Math.floor(wave/20);saveMeta(m);setTimeout(()=>bannerShow("🏅 موجة "+AR(wave)+" في اللانهائي! +"+AR(3+Math.floor(wave/20))+" 💎",3000),600)}
     const bonus=30+Math.ceil(wave*15/WMAX)*8;gold+=bonus;goldEarned+=bonus;
-    sfx("win");const it=Math.min(40,Math.floor(gold*.05));gold+=it;goldEarned+=it;say("الموجة خلصت! +"+AR(bonus)+" 💰"+(it>0?" + فايدة "+AR(it):""),2200);
+    sfx("win");const it=Math.min(40,Math.floor(gold*.05));gold+=it;goldEarned+=it;say("الموجة خلصت! ☠ "+AR(kills-wk0)+" · +"+AR(bonus)+" 💰"+(it>0?" + فايدة "+AR(it):""),2400);window.__wk=kills-wk0;
     waveG.push(goldEarned);
     if(lives>=livesW){perfS++;sfx("perf");const pb=10+wave*2+perfS*3;gold+=pb;goldEarned+=pb;setTimeout(()=>bannerShow("✨ موجة مثالية ×"+AR(perfS)+" +"+AR(pb)+" 💰",2200),500)}else perfS=0;
     if(wave>=WMAX){gameOver(true);return}
