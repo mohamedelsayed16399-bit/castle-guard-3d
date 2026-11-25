@@ -120,7 +120,7 @@ canvas{display:block;position:fixed;inset:0;touch-action:none}
   <button class="btn sm" id="tomenu">كل المراحل</button>
 </div>
 <div class="ov" id="shop"><h1>💎 تحسينات دائمة</h1><p id="gemline"></p><div id="shl" style="display:flex;flex-direction:column;gap:8px"></div><button class="btn sm" id="shback">رجوع</button></div>
-<div class="ov" id="ach"><h1>🏅 الإنجازات</h1><div id="achl"></div><p id="achs"></p><button class="btn sm" id="achx">رجوع</button></div><div id="combo" style="position:fixed;top:92px;right:10px;z-index:30;pointer-events:none;font:900 22px system-ui;color:#fde047;text-shadow:0 2px 6px #000,0 0 12px #f97316;opacity:0;transition:opacity .2s,transform .15s;direction:rtl;text-align:right"></div><div class="atoast" id="atoast"></div>
+<div class="ov" id="ach"><h1>🏅 الإنجازات</h1><div id="achl"></div><p id="achs"></p><button class="btn sm" id="achx">رجوع</button></div><div id="bbar" style="position:fixed;top:128px;left:50%;transform:translateX(-50%);width:72%;max-width:340px;z-index:29;pointer-events:none;display:none;direction:rtl;text-align:center;font:800 13px system-ui;color:#fff;text-shadow:0 1px 4px #000"><div id="bbn"></div><div style="height:12px;border-radius:7px;background:#0008;border:2px solid #000;overflow:hidden;margin-top:2px"><div id="bbf" style="height:100%;width:100%;background:linear-gradient(90deg,#ef4444,#f97316);transition:width .15s"></div></div></div><div id="combo" style="position:fixed;top:92px;right:10px;z-index:30;pointer-events:none;font:900 22px system-ui;color:#fde047;text-shadow:0 2px 6px #000,0 0 12px #f97316;opacity:0;transition:opacity .2s,transform .15s;direction:rtl;text-align:right"></div><div class="atoast" id="atoast"></div>
 <div class="ov" id="perk"><h1>🎁 اختار ميزة</h1><p>الميزة دي لحد آخر المرحلة</p><div id="perkb" style="display:flex;flex-direction:column;gap:10px"></div><p id="perkl"></p></div>
 <div class="ov" id="pause"><h1>⏸ وقفة</h1><div class="opt"><button class="btn xs" id="autob">⏭ موجة أوتو: مقفول</button><button class="btn xs" id="musb">🎵 موسيقى</button><button class="btn xs" id="qualb">🎨 جودة: عالية</button></div><button class="btn" id="resume">كمّل</button><button class="btn sm" id="pmenu">كل المراحل</button></div>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
@@ -491,6 +491,9 @@ let comboN=0,comboT=0,comboBest=0;
 function comboHit(){comboN++;comboT=2.6;if(comboN>comboBest)comboBest=comboN;const c=$("combo");
  if(comboN>=3){c.textContent="🔥 كومبو ×"+comboN;c.style.opacity=1;c.style.transform="scale(1.25)";setTimeout(()=>c.style.transform="scale(1)",140)}
  if(comboN%10==0){const b=comboN*2;gold+=b;goldEarned+=b;bannerShow("🔥 كومبو "+comboN+"! +"+b+" دهب",1600)}}
+function bossBar(){let b=null;for(const e of enemies)if(!e.dead&&e.d.boss&&e.delay<=0){b=e;break}
+ const el=$("bbar");if(!b){if(el.style.display!="none")el.style.display="none";return}
+ el.style.display="block";$("bbn").textContent="💀 "+b.d.name;const f=Math.max(0,b.hp/b.max);const x=$("bbf");x.style.width=(f*100)+"%";x.style.background=f<.5?"linear-gradient(90deg,#a855f7,#ef4444)":"linear-gradient(90deg,#ef4444,#f97316)"}
 function comboTick(dt){if(comboN>0){comboT-=dt;if(comboT<=0){comboN=0;$("combo").style.opacity=0}}}
 function bannerShow(t,ms=2600){const b=$("banner");b.textContent=t;b.classList.add("on");clearTimeout(b._t);b._t=setTimeout(()=>b.classList.remove("on"),ms)}
 function say(t,ms=1800){const m=$("msg");m.textContent=t;m.style.opacity=1;msgT=ms/1000}
@@ -1130,7 +1133,7 @@ function loop(){
   if(slowmo>0)slowmo-=raw;
   const dt=(state=="play"&&!paused)?raw*speedMul*(slowmo>0?.35:1):0;
   if(dt>0){
-    comboTick(dt);spawner(dt);
+    comboTick(dt);bossBar();spawner(dt);
     updateEnemies(dt);
     if(state!="play"){renderer.render(scene,cam);return}
     updateTowers(dt);
@@ -1167,7 +1170,7 @@ window.__enemies=()=>enemies.slice(0,3).map(e=>({t:e.t,prog:e.prog,delay:e.delay
 window.__pathlen=PATHLEN;
 window.__cellScreen=(c,r)=>{const p=cellPos(c,r).clone().project(cam);return{x:(p.x+1)/2*innerWidth,y:(-p.y+1)/2*innerHeight}};
 window.__set=(k,v)=>{if(k=='wave')wave=v;else if(k=='gold')gold=v;else if(k=='lives')lives=v;else if(k=='speed')speedMul=v;hud()};
-window.__startWave=startWave;window.__hero=()=>({pos:hero&&hero.position.toArray(),target:heroTarget&&heroTarget.toArray(),names:hero&&hero.userData.names,cur:hero&&hero.userData.cur,perk});window.__perk=offerPerk;window.__combo=()=>({comboN,comboBest,op:$("combo").style.opacity,txt:$("combo").textContent,gold});window.__music=()=>({musicOn,mStep,ac:AC&&AC.state});window.__setStage2=i=>{endless=false;newGame(i)};window.__gems=n=>{const m=meta();m.gems+=n;saveMeta(m)};window.__bliz=n=>{bliz=n};window.__hz=()=>{hzT=0};window.__hzs=()=>({warn:hzWarn.length,bliz,dis:towers.map(t=>t.dis||0)});window.__setStage=i=>{endless=false;newGame(i)};window.__heal=healCast;window.__heal0=()=>{healCd=0};window.__upg=(i,lv)=>{const t=towers[i];if(t){scene.remove(t.m);t.lv=lv;t.m=towerModel(t.type,lv);t.m.position.copy(cellPos(t.c,t.r));scene.add(t.m)}};window.__chest=spawnChest;window.__chests=()=>chests.length;window.__chestc=()=>chests.map(k=>[k.c,k.r]);window.__stage=i=>{endless=false;newGame(i)};window.__hl=()=>({heroLv,heroXp});window.__spawn=(t)=>{spawnEnemy(t)};window.__gain=heroGain;window.__dmg=(t,a)=>{const e=enemies.find(x=>x.t==t&&!x.dead);if(e)damage(e,a)};window.__ult=ultimate;window.__mod=()=>mod;window.__light=()=>({h:hemi.intensity,s:sun.intensity});window.__tapxy=null;window.__cam=cam;window.__look=camLook;window.__base=camBase;
+window.__startWave=startWave;window.__hero=()=>({pos:hero&&hero.position.toArray(),target:heroTarget&&heroTarget.toArray(),names:hero&&hero.userData.names,cur:hero&&hero.userData.cur,perk});window.__perk=offerPerk;window.__bbar=()=>({d:$("bbar").style.display,n:$("bbn").textContent,w:$("bbf").style.width});window.__combo=()=>({comboN,comboBest,op:$("combo").style.opacity,txt:$("combo").textContent,gold});window.__music=()=>({musicOn,mStep,ac:AC&&AC.state});window.__setStage2=i=>{endless=false;newGame(i)};window.__gems=n=>{const m=meta();m.gems+=n;saveMeta(m)};window.__bliz=n=>{bliz=n};window.__hz=()=>{hzT=0};window.__hzs=()=>({warn:hzWarn.length,bliz,dis:towers.map(t=>t.dis||0)});window.__setStage=i=>{endless=false;newGame(i)};window.__heal=healCast;window.__heal0=()=>{healCd=0};window.__upg=(i,lv)=>{const t=towers[i];if(t){scene.remove(t.m);t.lv=lv;t.m=towerModel(t.type,lv);t.m.position.copy(cellPos(t.c,t.r));scene.add(t.m)}};window.__chest=spawnChest;window.__chests=()=>chests.length;window.__chestc=()=>chests.map(k=>[k.c,k.r]);window.__stage=i=>{endless=false;newGame(i)};window.__hl=()=>({heroLv,heroXp});window.__spawn=(t)=>{spawnEnemy(t)};window.__gain=heroGain;window.__dmg=(t,a)=>{const e=enemies.find(x=>x.t==t&&!x.dead);if(e)damage(e,a)};window.__ult=ultimate;window.__mod=()=>mod;window.__light=()=>({h:hemi.intensity,s:sun.intensity});window.__tapxy=null;window.__cam=cam;window.__look=camLook;window.__base=camBase;
 window.__towers=()=>towers.map(t=>({type:t.type,lv:t.lv,c:t.c,r:t.r}));
 </script>
 </body>
