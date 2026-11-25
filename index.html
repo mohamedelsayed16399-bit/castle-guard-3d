@@ -1114,7 +1114,7 @@ function renderStages(){
   });
   const t=c.s.reduce((a,b)=>a+b,0);
   $("stn").textContent="النجوم: "+AR(t)+" / "+AR(STAGES.length*3);
-  const h=hs();$("hsline").textContent=h.wave?"أحسن نتيجة: موجة "+AR(h.wave)+" ☠ "+AR(h.kills):"";
+  const h=hs();$("hsline").textContent=h.wave?"أحسن نتيجة: موجة "+AR(h.wave)+" ☠ "+AR(h.kills):"";if(XST.kills>0)$("hsline").textContent+=(h.wave?"\n":"")+"☠ إجمالي القتلى: "+AR(XST.kills)+" · 🏆 انتصارات: "+AR(XST.wins);$("hsline").style.whiteSpace="pre-line";window.__hs2=$("hsline").textContent;
   $("go").textContent=c.u>0||c.s[0]?"كمّل الحملة ◀":"ابدأ اللعب";
 }
 function toMenu(){state="menu";$("heal").style.display="none";$("ult").style.display="none";$("modb").style.display="none";paused=false;perkOpen=false;$("perk").classList.remove("on");$("end").classList.remove("on");$("pause").classList.remove("on");renderStages();$("start").classList.add("on")}
