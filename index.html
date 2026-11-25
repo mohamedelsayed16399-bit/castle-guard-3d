@@ -120,7 +120,7 @@ canvas{display:block;position:fixed;inset:0;touch-action:none}
   <button class="btn sm" id="tomenu">كل المراحل</button>
 </div>
 <div class="ov" id="shop"><h1>💎 تحسينات دائمة</h1><p id="gemline"></p><div id="shl" style="display:flex;flex-direction:column;gap:8px"></div><button class="btn sm" id="shback">رجوع</button></div>
-<div class="ov" id="ach"><h1>🏅 الإنجازات</h1><div id="achl"></div><p id="achs"></p><button class="btn sm" id="achx">رجوع</button></div><div id="bbar" style="position:fixed;top:128px;left:50%;transform:translateX(-50%);width:72%;max-width:340px;z-index:29;pointer-events:none;display:none;direction:rtl;text-align:center;font:800 13px system-ui;color:#fff;text-shadow:0 1px 4px #000"><div id="bbn"></div><div style="height:12px;border-radius:7px;background:#0008;border:2px solid #000;overflow:hidden;margin-top:2px"><div id="bbf" style="height:100%;width:100%;background:linear-gradient(90deg,#ef4444,#f97316);transition:width .15s"></div></div></div><div id="combo" style="position:fixed;top:92px;right:10px;z-index:30;pointer-events:none;font:900 22px system-ui;color:#fde047;text-shadow:0 2px 6px #000,0 0 12px #f97316;opacity:0;transition:opacity .2s,transform .15s;direction:rtl;text-align:right"></div><div class="atoast" id="atoast"></div>
+<div class="ov" id="ach"><h1>🏅 الإنجازات</h1><div id="achl"></div><p id="achs"></p><button class="btn sm" id="achx">رجوع</button></div><div id="leakfx" style="position:fixed;inset:0;z-index:28;pointer-events:none;opacity:0;transition:opacity .45s;box-shadow:inset 0 0 90px 24px rgba(239,68,68,.75)"></div><div id="bbar" style="position:fixed;top:128px;left:50%;transform:translateX(-50%);width:72%;max-width:340px;z-index:29;pointer-events:none;display:none;direction:rtl;text-align:center;font:800 13px system-ui;color:#fff;text-shadow:0 1px 4px #000"><div id="bbn"></div><div style="height:12px;border-radius:7px;background:#0008;border:2px solid #000;overflow:hidden;margin-top:2px"><div id="bbf" style="height:100%;width:100%;background:linear-gradient(90deg,#ef4444,#f97316);transition:width .15s"></div></div></div><div id="combo" style="position:fixed;top:92px;right:10px;z-index:30;pointer-events:none;font:900 22px system-ui;color:#fde047;text-shadow:0 2px 6px #000,0 0 12px #f97316;opacity:0;transition:opacity .2s,transform .15s;direction:rtl;text-align:right"></div><div class="atoast" id="atoast"></div>
 <div class="ov" id="perk"><h1>🎁 اختار ميزة</h1><p>الميزة دي لحد آخر المرحلة</p><div id="perkb" style="display:flex;flex-direction:column;gap:10px"></div><p id="perkl"></p></div>
 <div class="ov" id="pause"><h1>⏸ وقفة</h1><div class="opt"><button class="btn xs" id="autob">⏭ موجة أوتو: مقفول</button><button class="btn xs" id="musb">🎵 موسيقى</button><button class="btn xs" id="qualb">🎨 جودة: عالية</button></div><button class="btn" id="resume">كمّل</button><button class="btn sm" id="pmenu">كل المراحل</button></div>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
@@ -494,6 +494,7 @@ function comboHit(){comboN++;comboT=2.6;if(comboN>comboBest)comboBest=comboN;con
 function bossBar(){let b=null;for(const e of enemies)if(!e.dead&&e.d.boss&&e.delay<=0){b=e;break}
  const el=$("bbar");if(!b){if(el.style.display!="none")el.style.display="none";return}
  el.style.display="block";$("bbn").textContent="💀 "+b.d.name;const f=Math.max(0,b.hp/b.max);const x=$("bbf");x.style.width=(f*100)+"%";x.style.background=f<.5?"linear-gradient(90deg,#a855f7,#ef4444)":"linear-gradient(90deg,#ef4444,#f97316)"}
+function leakFlash(){const f=$("leakfx");f.style.transition="none";f.style.opacity=1;void f.offsetWidth;f.style.transition="opacity .6s";f.style.opacity=0;window.__lf=(window.__lf||0)+1}
 let livesW=0,perfS=0,duskT=0,duskC=0;const SUNA=new THREE.Color(0xfff3d6),SUNB=new THREE.Color(0xff9a52);
 function duskTick(dt){duskC+=(duskT-duskC)*Math.min(1,dt*.8);hemi.intensity=1.05*(1-.3*duskC);sun.intensity=2.1*(1-.2*duskC);sun.color.copy(SUNA).lerp(SUNB,duskC*.8)}
 function comboTick(dt){duskTick(dt);if(comboN>0){comboT-=dt;if(comboT<=0){comboN=0;$("combo").style.opacity=0}}}
@@ -876,7 +877,7 @@ function updateEnemies(dt){
       if(e.slowT>0)e.slowT-=dt;
       if(e.prog>=1){ // leaked
         e.dead=true;lives-=e.d.dmg;scene.remove(e.m);scene.remove(e.hbG);
-        sfx("leak");shake=Math.max(shake,.6);
+        sfx("leak");shake=Math.max(shake,.6);leakFlash();
         $("vign").classList.add("hurt");setTimeout(()=>$("vign").classList.remove("hurt"),300);
         say(e.d.boss?"الزعيم دخل القلعة!! 😱":"-"+AR(e.d.dmg)+" ❤️",900);
         hud();
