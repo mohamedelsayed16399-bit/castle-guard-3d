@@ -1130,7 +1130,7 @@ function renderStages(){
   });
   const t=c.s.reduce((a,b)=>a+b,0);
   $("stn").textContent="النجوم: "+AR(t)+" / "+AR(STAGES.length*3);
-  const h=hs();$("hsline").textContent=h.wave?"أحسن نتيجة: موجة "+AR(h.wave)+" ☠ "+AR(h.kills):"";if(XST.kills>0)$("hsline").textContent+=(h.wave?"\n":"")+"☠ إجمالي القتلى: "+AR(XST.kills)+" · 🏆 انتصارات: "+AR(XST.wins);$("hsline").style.whiteSpace="pre-line";{let ts=0,n=STAGES.length;try{const cc=JSON.parse(localStorage.getItem("cg3d_camp")||"{}");for(const v of (cc.s||[]))ts+=v|0}catch(e){}if(ts>0)$("hsline").textContent+=((($("hsline").textContent)?"\n":"")+"★ نجومك: "+AR(ts)+"/"+AR(n*3))}window.__hs2=$("hsline").textContent;
+  const h=hs();$("hsline").textContent=h.wave?"أحسن نتيجة: موجة "+AR(h.wave)+" ☠ "+AR(h.kills):"";if(XST.kills>0)$("hsline").textContent+=(h.wave?"\n":"")+"☠ إجمالي القتلى: "+AR(XST.kills)+" · 🏆 انتصارات: "+AR(XST.wins);$("hsline").style.whiteSpace="pre-line";window.__hs2=$("hsline").textContent;
 {try{const day=new Date().toISOString().slice(0,10);let d=JSON.parse(localStorage.getItem("cg3d_dch")||"null");if(!d||d.day!==day){d={day,base:XST.kills,goal:150+50*(new Date().getDate()%5),done:0};localStorage.setItem("cg3d_dch",JSON.stringify(d))}
  const pr=Math.max(0,XST.kills-d.base);let t="🎯 تحدي اليوم: اقتل "+AR(d.goal)+" عدو ("+AR(Math.min(pr,d.goal))+"/"+AR(d.goal)+")";
  if(pr>=d.goal){if(!d.done){d.done=1;localStorage.setItem("cg3d_dch",JSON.stringify(d));const m=meta();m.gems+=10;saveMeta(m);setTimeout(()=>{const a=$("atoast");a.textContent="🎯 خلصت تحدي اليوم: +١٠ 💎";a.classList.add("on");setTimeout(()=>a.classList.remove("on"),3000)},600)}t+=" ✅"}
