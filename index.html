@@ -73,6 +73,12 @@ canvas{display:block;position:fixed;inset:0;touch-action:none}
 #perkl{font-size:13px;color:#94a3b8;max-width:420px}
 .opt{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
 .btn.xs.on2{background:linear-gradient(180deg,#22c55e,#166534)}
+#ult{position:fixed;right:10px;bottom:98px;width:74px;height:74px;border-radius:50%;border:3px solid #22d3ee;background:radial-gradient(circle,#0e7490,#164e63);color:#fff;font-family:inherit;font-weight:900;font-size:12px;line-height:1.2;z-index:3;display:none;box-shadow:0 0 18px #22d3ee88;cursor:pointer}
+#ult b{display:block;font-size:26px}
+#ult.cd{filter:grayscale(.9);opacity:.6;box-shadow:none}
+#ult.rdy{animation:pl 1s infinite alternate}
+@keyframes pl{to{box-shadow:0 0 30px #22d3ee}}
+#modb{position:fixed;top:92px;left:50%;transform:translateX(-50%);padding:6px 16px;border-radius:99px;font-weight:900;font-size:14px;background:#4c1d95dd;border:1px solid #c4b5fd88;z-index:2;display:none;pointer-events:none;white-space:nowrap}
 </style>
 </head>
 <body>
@@ -87,14 +93,14 @@ canvas{display:block;position:fixed;inset:0;touch-action:none}
   <div id="wbar"><div id="wfill"></div></div>
   <div id="pv"></div>
 </div>
-<div id="msg"></div>
+<div id="msg"></div><div id="modb"></div><button id="ult"><b>🌀</b>عاصفة</button>
 <div id="banner"></div>
 <div id="pop"></div>
 <div id="bar"></div>
 <div class="ov on" id="load" style="z-index:9"><h1>🏰</h1><p id="ltxt">جاري تحميل المجسمات ثلاثية الأبعاد…</p></div>
 <div class="ov on" id="start">
   <h1>🏰 حارس القلعة</h1>
-  <p>حملة من ٥ مراحل، كل واحدة أصعب من اللي قبلها: ٦ أنواع أبراج × ٤ مستويات، بطل فارس بتحركه بإيدك، ميزات كل ٥ موجات، أعداء جداد، زعماء، وقدرتين خاصتين (☄ نيزك و ❄ تجميد). النجوم والمراحل اللي فتحتها بتتحفظ على موبايلك.<br>دوس على أرض خضرا عشان تبني، وبعدين ابدأ الموجة.</p>
+  <p>حملة من ٥ مراحل، كل واحدة أصعب من اللي قبلها: ٦ أنواع أبراج × ٤ مستويات، بطل فارس بتحركه بإيدك وعاصفة خاصة بيه، ميزات كل ٥ موجات، تحديات عشوائية في الموجات، أعداء جداد، زعماء، وقدرتين خاصتين (☄ نيزك و ❄ تجميد). النجوم والمراحل اللي فتحتها بتتحفظ على موبايلك.<br>دوس على أرض خضرا عشان تبني، وبعدين ابدأ الموجة.</p>
   <div class="sg" id="sg"></div>
   <div id="stn"></div>
   <p class="hs" id="hsline"></p>
@@ -194,7 +200,7 @@ scene.fog=new THREE.Fog(0x87b5d6,40,110);
 // sky: vertical gradient + sun glow + clouds, drawn on canvas
 function skyTex(){const c=document.createElement("canvas");c.width=4;c.height=256;const g=c.getContext("2d");const gr=g.createLinearGradient(0,0,0,256);gr.addColorStop(0,"#2a6db8");gr.addColorStop(.5,"#7fb7e8");gr.addColorStop(.78,"#cfe8f7");gr.addColorStop(.8,"#e8d9a8");gr.addColorStop(1,"#c9b276");g.fillStyle=gr;g.fillRect(0,0,4,256);const t=new THREE.CanvasTexture(c);return t}
 {const sky=new THREE.Mesh(new THREE.SphereGeometry(160,24,16),new THREE.MeshBasicMaterial({map:skyTex(),side:THREE.BackSide,fog:false}));scene.add(sky)}
-scene.add(new THREE.HemisphereLight(0xdcecff,0x4a6a3c,1.05));
+const hemi=new THREE.HemisphereLight(0xdcecff,0x4a6a3c,1.05);scene.add(hemi);
 const sun=new THREE.DirectionalLight(0xfff3d6,2.1);
 sun.position.set(18,30,10);sun.castShadow=true;
 sun.shadow.mapSize.set(2048,2048);
@@ -364,7 +370,7 @@ function enemyModel(t){
 }
 // ---------- state ----------
 let gold,lives,wave,kills,dmgDealt,goldEarned,state="menu",enemies=[],towers=[],shots=[],parts=[],floats=[],queue=[],spT=0,inWave=false,speedMul=1,popTarget=null,msgT=0,buildType=null,ghost=null,ring,bossAlive=false,paused=false;
-let hero=null,heroTarget=null,heroCd=0,heroRing=null,perk={dmg:1,range:1,rate:1,gold:1,hero:1,got:[]},perkOpen=false,autoWave=localStorage.getItem("cg3d_auto")=="1",lowQ=localStorage.getItem("cg3d_lowq")=="1",heroHint=false;
+let mod=null,ultCd=0,ultMax=22,hero=null,heroTarget=null,heroCd=0,heroRing=null,perk={dmg:1,range:1,rate:1,gold:1,hero:1,got:[]},perkOpen=false,autoWave=localStorage.getItem("cg3d_auto")=="1",lowQ=localStorage.getItem("cg3d_lowq")=="1",heroHint=false;
 let abMeteor={cd:0,max:26},abFreeze={cd:0,max:32};
 const V3=THREE.Vector3;
 const ACHS=[["k100","حارس","اقتل 100 عدو",x=>x.kills>=100],["k1000","مدافع شرس","اقتل 1000 عدو",x=>x.kills>=1000],["k5000","جحيم الأسوار","اقتل 5000 عدو",x=>x.kills>=5000],["w1","أول نصر","اكسب مرحلة",x=>x.wins>=1],["w5","صدّ الهجمات","اكسب 5 مرات",x=>x.wins>=5],["camp","أسطورة","خلّص الحملة",x=>x.camp],["s3","نجوم","3 نجوم في مرحلة",x=>x.star3>=1],["s15","جامع النجوم","10 نجوم إجمالي",x=>x.stars>=10],["e15","صمود","موجة 15 في اللانهائي",x=>x.endw>=15],["e30","لا ينكسر","موجة 30 في اللانهائي",x=>x.endw>=30],["hd","شجاع","اكسب في الصعب",x=>x.hardwin>=1],["r10","مثابر","10 جولات",x=>x.runs>=10]];
@@ -578,6 +584,14 @@ renderer.domElement.addEventListener("pointerup",ev=>{
 function startWave(){
   if(inWave||state!="play"||paused)return;
   wave++;inWave=true;queue=waveComp(wave);
+  mod=null;
+  {const isBoss=queue.some(t=>EN[t].boss);
+   if(wave>=3&&!isBoss&&wave<WMAX&&Math.random()<.45){
+    const M=[{k:"fog",n:"🌫 ضباب: مدى الأبراج -٢٠٪",range:.8},{k:"storm",n:"💨 عاصفة: الأعداء أسرع ٢٥٪",spd:1.25},{k:"loot",n:"💰 موجة غنيمة: الذهب ×٢",gold:2},{k:"horde",n:"🧟 حشد: أعداد أكتر ٤٠٪"}];
+    mod=M[Math.floor(Math.random()*M.length)];
+    if(mod.k=="horde"){const ex=queue.filter(t=>!EN[t].boss).slice(0,Math.floor(queue.length*.4));queue=queue.concat(ex)}
+    bannerShow(mod.n,3200);}}
+  {const mb=$("modb");if(mod){mb.textContent=mod.n;mb.style.display="block"}else mb.style.display="none"}
   spT=.4;sfx("build");
   {const ew=Math.ceil(wave*15/WMAX);say(wave==WMAX?"⚔ الموجة الأخيرة!":ew==8?"⚠ موجة الزعيم!":"الموجة "+AR(wave))}
   if(Math.ceil(wave*15/WMAX)==6)bannerShow("👁 طيّارين قادمين — المدفع والهاون مبيضربوش طاير!");
@@ -635,7 +649,7 @@ function damage(e,amt,crit=false){
   if(e.hp<=0)kill(e);
 }
 function kill(e){
-  e.dead=true;kills++;XST.kills++;if((XST.kills&7)==0)chkAch();{const g0=Math.round(e.d.gold*perk.gold);gold+=g0;goldEarned+=g0}
+  e.dead=true;kills++;XST.kills++;if((XST.kills&7)==0)chkAch();{const g0=Math.round(e.d.gold*perk.gold*(mod&&mod.gold||1));gold+=g0;goldEarned+=g0}
   combo=(clockT-lastKill<2.2)?combo+1:1;lastKill=clockT;
   if(combo>=6&&combo%6==0){const b=combo;gold+=b;goldEarned+=b;floatText(e.m.position,"🔥x"+combo+" +"+b,"#fb923c")}
   if(e.d.splits){for(let i=0;i<2;i++){const c=spawnEnemy("mini");c.prog=Math.max(0,(e.prog||0)-.01*i);c.dist=e.dist;const p=curve.getPointAt(clamp(c.prog,0,1));c.m.position.set(p.x,0,p.z)}burst(e.m.position,0xf97316,12,5)}
@@ -672,7 +686,7 @@ function fireTower(tw,dt){
     if(e.dead||e.delay>0)continue;
     if(e.d.fly&&!t.canFly)continue;
     const d=e.m.position.distanceTo(tw.m.position);
-    if(d>cur.range*perk.range)continue;
+    if(d>cur.range*perk.range*(mod&&mod.range||1))continue;
     let key;
     if(tw.mode=="strong")key=e.hp;
     else if(tw.mode=="close")key=-d;
@@ -715,6 +729,18 @@ function spawnHero(){
 }
 function heroAnim(name){const a=hero.userData.acts;if(!a)return;const pick=[name,name=="run"?"Running_A":"Idle"].find(n=>a[n])||hero.userData.names.find(n=>/idle/i.test(n));if(hero.userData.cur===pick||!pick)return;
   for(const k in a)a[k].fadeOut(.15);a[pick].reset().fadeIn(.15).play();hero.userData.cur=pick}
+function ultimate(){
+  if(state!="play"||paused||ultCd>0||!hero)return;
+  ultCd=ultMax;sfx("boom");shake=Math.max(shake,.7);
+  const p=hero.position,R=4.8,dm=(110+wave*9)*(1+.25*(meta().lv.hero||0))*perk.hero;
+  for(let k=0;k<3;k++){const rg=new THREE.Mesh(new THREE.RingGeometry(.3,.9,32),new THREE.MeshBasicMaterial({color:k?0x67e8f9:0xffffff,side:2,transparent:true,opacity:.9,depthWrite:false}));rg.rotation.x=-Math.PI/2;rg.position.set(p.x,.2+k*.05,p.z);scene.add(rg);parts.push({m:rg,v:null,l:.5+k*.12,tl:.5+k*.12,ring:R+k*1.2})}
+  burst(p,0x22d3ee,26,9);
+  for(const e of enemies){if(e.dead||e.delay>0||e.d.fly)continue;if(e.m.position.distanceTo(p)<=R){damage(e,dm);if(!e.d.boss)e.stun=Math.max(e.stun,1.2);else e.stun=Math.max(e.stun,.4)}}
+  bannerShow("🌀 عاصفة البطل!",1500);hud();
+}
+$("ult").onclick=ultimate;
+function updateUlt(dt){ultCd=Math.max(0,ultCd-dt);const b=$("ult");b.style.display=state=="play"?"block":"none";
+  if(ultCd>0){b.className="cd";b.innerHTML="<b>"+AR(Math.ceil(ultCd))+"</b>ث"}else{b.className="rdy";b.innerHTML="<b>🌀</b>عاصفة"}}
 function updateHero(dt){
   if(!hero)return;
   const mx=hero.userData.mixer;if(mx)mx.update(dt);
@@ -765,7 +791,7 @@ function updateEnemies(dt){
     if(e.mx)e.mx.update(e.stun>0?0:dt*(e.slowT>0?1-e.slow:1));
     if(e.stun>0){e.stun-=dt;if(Math.random()<dt*4)burst(e.m.position,0x7dd3fc,1,1)}
     else{
-      const sp=e.spd*(e.slowT>0?1-e.slow:1);
+      const sp=e.spd*(e.slowT>0?1-e.slow:1)*(mod&&mod.spd||1);
       e.dist+=sp*dt/PATHLEN*60; // dist in arbitrary progress units
       e.prog=(e.prog||0)+sp*dt/PATHLEN;
       if(e.slowT>0)e.slowT-=dt;
@@ -861,6 +887,9 @@ function updateAmbient(dt){
     for(let i=0;i<pos.count;i++){const x=pos.getX(i);pos.setZ(i,Math.sin(clockT*6+x*4)*.08*(x+.5))}
     pos.needsUpdate=true}
   if(scene.userData.caveGlow)scene.userData.caveGlow.material.opacity=.35+Math.sin(clockT*2.5)*.2;
+  {const k=state=="play"?clamp(wave/Math.max(WMAX>500?30:WMAX,1),0,1):0;
+   hemi.intensity=lerp(hemi.intensity,lerp(1.05,.62,k),dt*2);sun.intensity=lerp(sun.intensity,lerp(2.1,1.35,k),dt*2);
+   sun.color.lerpColors(new THREE.Color(0xfff3d6),new THREE.Color(0xff9a5a),k*dt*0+k);renderer.toneMappingExposure=lerp(renderer.toneMappingExposure,lerp(1.05,.9,k),dt*2)}
   updateWeather(dt);
   if(msgT>0){msgT-=dt;if(msgT<=0)$("msg").style.opacity=0}
   // ability cooldown ticks refresh bar
@@ -870,7 +899,7 @@ function updateAmbient(dt){
 }
 function waveDoneCheck(){
   if(inWave&&queue.length==0&&enemies.filter(e=>!e.dead).length==0&&!bossAlive){
-    inWave=false;
+    inWave=false;mod=null;$("modb").style.display="none";
     const bonus=30+Math.ceil(wave*15/WMAX)*8;gold+=bonus;goldEarned+=bonus;
     sfx("win");say("الموجة خلصت! +"+AR(bonus)+" 💰");
     if(wave>=WMAX){gameOver(true);return}
@@ -892,7 +921,7 @@ function newGame(si){
   for(const c of cells)c.userData.taken=false;
   enemies=[];towers=[];shots=[];parts=[];floats=[];queue=[];
   gold=ST.gold+40*(meta().lv.gold||0);lives=ST.lives+2*(meta().lv.hp||0);combo=0;slowmo=0;wave=0;kills=0;dmgDealt=0;goldEarned=0;inWave=false;state="play";speedMul=1;paused=false;bossAlive=false;
-  abMeteor.cd=0;abFreeze.cd=0;buildType=null;closePop();perk={dmg:1,range:1,rate:1,gold:1,hero:1,got:[]};perkOpen=false;$("perk").classList.remove("on");spawnHero();if(!heroHint){heroHint=true;setTimeout(()=>bannerShow("🛡 البطل: دوس على أي مكان فاضي عشان تحرّكه",4200),3400)}
+  abMeteor.cd=0;abFreeze.cd=0;buildType=null;closePop();perk={dmg:1,range:1,rate:1,gold:1,hero:1,got:[]};mod=null;ultCd=6;$("modb").style.display="none";perkOpen=false;$("perk").classList.remove("on");spawnHero();if(!heroHint){heroHint=true;setTimeout(()=>bannerShow("🛡 البطل: دوس على أي مكان فاضي عشان تحرّكه",4200),3400)}
   $("end").classList.remove("on");$("start").classList.remove("on");$("pause").classList.remove("on");
   hud();mkBar();say(ST.ic+" "+ST.n+" 🏰",2500);bannerShow(endless?"♾ لانهائي: "+ST.n:"المرحلة "+AR(stageIdx+1)+": "+ST.n+" ، "+AR(WMAX)+" موجة"+(hard?" 🔥":""),3200);
 }
@@ -913,9 +942,9 @@ function renderStages(){
   const h=hs();$("hsline").textContent=h.wave?"أحسن نتيجة: موجة "+AR(h.wave)+" ☠ "+AR(h.kills):"";
   $("go").textContent=c.u>0||c.s[0]?"كمّل الحملة ◀":"ابدأ اللعب";
 }
-function toMenu(){state="menu";paused=false;perkOpen=false;$("perk").classList.remove("on");$("end").classList.remove("on");$("pause").classList.remove("on");renderStages();$("start").classList.add("on")}
+function toMenu(){state="menu";$("ult").style.display="none";$("modb").style.display="none";paused=false;perkOpen=false;$("perk").classList.remove("on");$("end").classList.remove("on");$("pause").classList.remove("on");renderStages();$("start").classList.add("on")}
 function gameOver(win){
-  state="over";saveHs();XST.runs++;XST.kills+=0;
+  state="over";$("ult").style.display="none";$("modb").style.display="none";saveHs();XST.runs++;XST.kills+=0;
   if(win&&!endless){XST.wins++;if(hard)XST.hardwin++;if(stageIdx==4)XST.camp=true}
   if(endless)XST.endw=Math.max(XST.endw,wave);
   const h=hs();
@@ -988,6 +1017,7 @@ function loop(){
     if(state!="play"){renderer.render(scene,cam);return}
     updateTowers(dt);
     updateHero(dt);
+    updateUlt(dt);
     updateShots(dt);
     updateParts(dt);
     waveDoneCheck();
@@ -1016,7 +1046,7 @@ window.__enemies=()=>enemies.slice(0,3).map(e=>({t:e.t,prog:e.prog,delay:e.delay
 window.__pathlen=PATHLEN;
 window.__cellScreen=(c,r)=>{const p=cellPos(c,r).clone().project(cam);return{x:(p.x+1)/2*innerWidth,y:(-p.y+1)/2*innerHeight}};
 window.__set=(k,v)=>{if(k=='wave')wave=v;else if(k=='gold')gold=v;else if(k=='lives')lives=v;else if(k=='speed')speedMul=v;hud()};
-window.__startWave=startWave;window.__hero=()=>({pos:hero&&hero.position.toArray(),target:heroTarget&&heroTarget.toArray(),names:hero&&hero.userData.names,cur:hero&&hero.userData.cur,perk});window.__perk=offerPerk;window.__tapxy=null;window.__cam=cam;window.__look=camLook;window.__base=camBase;
+window.__startWave=startWave;window.__hero=()=>({pos:hero&&hero.position.toArray(),target:heroTarget&&heroTarget.toArray(),names:hero&&hero.userData.names,cur:hero&&hero.userData.cur,perk});window.__perk=offerPerk;window.__ult=ultimate;window.__mod=()=>mod;window.__light=()=>({h:hemi.intensity,s:sun.intensity});window.__tapxy=null;window.__cam=cam;window.__look=camLook;window.__base=camBase;
 window.__towers=()=>towers.map(t=>({type:t.type,lv:t.lv,c:t.c,r:t.r}));
 </script>
 </body>
