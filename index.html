@@ -874,7 +874,10 @@ function healCast(){if(state!="play"||paused||healCd>0)return;healCd=45;lives+=3
   bannerShow("💚 ترميم الأسوار +٣ ❤️",1600);hud()}
 $("heal").onclick=healCast;
 $("ult").onclick=ultimate;
-function updateUlt(dt){shCd=Math.max(0,shCd-dt);{const h=$("shld");h.style.display=state=="play"?"block":"none";if(shCd>0){h.className="cd";h.innerHTML="<b>"+AR(Math.ceil(shCd))+"</b>ث"}else if(shieldN>0){h.className="";h.innerHTML="<b>🛡"+AR(shieldN)+"</b>شغال"}else{h.className="";h.innerHTML="<b>🛡</b>درع"}}healCd=Math.max(0,healCd-dt);{const h=$("heal");h.style.display=state=="play"?"block":"none";if(healCd>0){h.className="cd";h.innerHTML="<b>"+AR(Math.ceil(healCd))+"</b>ث"}else{h.className="";h.innerHTML="<b>💚</b>ترميم"}}ultCd=Math.max(0,ultCd-dt);const b=$("ult");b.style.display=state=="play"?"block":"none";
+let dome=null;window.__dome=()=>dome?dome.visible+" "+dome.position.toArray().map(x=>Math.round(x*10)/10):"none";
+function updateDome(dt){if(!dome){dome=new THREE.Mesh(new THREE.SphereGeometry(3.2,20,14),new THREE.MeshBasicMaterial({color:0xa78bfa,transparent:true,opacity:.2,depthWrite:false,side:2}));dome.visible=false;scene.add(dome)}
+  dome.visible=shieldN>0&&state=="play";if(dome.visible&&castleP){dome.position.set(castleP.x,1.2,castleP.z);const k=1+.04*Math.sin(performance.now()/250);dome.scale.set(k,k,k);dome.material.opacity=.14+.06*shieldN/3}}
+function updateUlt(dt){updateDome(dt);shCd=Math.max(0,shCd-dt);{const h=$("shld");h.style.display=state=="play"?"block":"none";if(shCd>0){h.className="cd";h.innerHTML="<b>"+AR(Math.ceil(shCd))+"</b>ث"}else if(shieldN>0){h.className="";h.innerHTML="<b>🛡"+AR(shieldN)+"</b>شغال"}else{h.className="";h.innerHTML="<b>🛡</b>درع"}}healCd=Math.max(0,healCd-dt);{const h=$("heal");h.style.display=state=="play"?"block":"none";if(healCd>0){h.className="cd";h.innerHTML="<b>"+AR(Math.ceil(healCd))+"</b>ث"}else{h.className="";h.innerHTML="<b>💚</b>ترميم"}}ultCd=Math.max(0,ultCd-dt);const b=$("ult");b.style.display=state=="play"?"block":"none";
   if(ultCd>0){b.className="cd";b.innerHTML="<b>"+AR(Math.ceil(ultCd))+"</b>ث"}else{b.className="rdy";b.innerHTML="<b>🌀</b>عاصفة"}}
 function updateHero(dt){
   if(!hero)return;
