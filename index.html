@@ -846,7 +846,7 @@ function heroLabel(){
   const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c),transparent:true,depthWrite:false,depthTest:false}));
   sp.scale.set(1.8,.63,1);sp.position.y=2.7;hero.add(sp);hero.userData.lbl=sp}
 function heroGain(n){heroXp+=n;const need=14+heroLv*10;{const b=Math.floor(Math.min(1,heroXp/need)*10);if(b!=hxB){hxB=b;heroLabel()}}
-  if(heroXp>=need&&heroLv<10){heroXp-=need;heroLv++;heroLabel();sfx("win");bannerShow("🛡 البطل وصل مستوى "+AR(heroLv)+"!",2200);if(hero)burst(hero.position,0x67e8f9,18,8)}}
+  if(heroXp>=need&&heroLv<10){heroXp-=need;heroLv++;heroLabel();sfx("win");bannerShow("🛡 البطل وصل مستوى "+AR(heroLv)+"!",2200);if(hero){burst(hero.position,0x67e8f9,18,8);ringFx(hero.position,0xfacc15);setTimeout(()=>{if(hero)ringFx(hero.position,0x67e8f9)},160);floatText(hero.position,"⬆ مستوى "+AR(heroLv),"#67e8f9");window.__lvfx=(window.__lvfx||0)+1}}}
 function spawnHero(){
   if(hero){scene.remove(hero)}
   {const sk=SKINS[skinSt().cur]||SKINS[0];hero=inst("knight",Object.assign({h:1.9,anim:"Idle"},sk.t?{tint:sk.t,tintMix:.5}:{}))}
