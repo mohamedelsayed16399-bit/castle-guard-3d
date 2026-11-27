@@ -130,6 +130,7 @@ canvas{display:block;position:fixed;inset:0;touch-action:none}
 <script src="m2a.js?v=1"></script>
 <script src="m2b.js?v=1"></script>
 <script src="m2c.js?v=1"></script>
+<script src="m2d.js?v=1"></script>
 <script type="module">
 import * as THREE from "three";
 import {GLTFLoader} from "three/addons/loaders/GLTFLoader.js";
@@ -839,11 +840,11 @@ function fireTower(tw,dt){
   // projectiles
   const arch=tw.type=="archer",frost=tw.type=="frost"||tw.type=="venom",mort=tw.type=="mortar";
   const geo=arch?new THREE.ConeGeometry(.07,.4,5):frost?new THREE.IcosahedronGeometry(.16):mort?new THREE.SphereGeometry(.28,8,6):new THREE.SphereGeometry(.2,8,6);
-  const m=new THREE.Mesh(geo,new THREE.MeshBasicMaterial({color:frost?0x7dd3fc:mort?0xfb7185:arch?0xd9f99d:0xffa726}));
+  let m;if(arch&&A.m2_arrow){m=inst("m2_arrow",{h:.75});m.userData.arrow=1}else m=new THREE.Mesh(geo,new THREE.MeshBasicMaterial({color:frost?0x7dd3fc:mort?0xfb7185:arch?0xd9f99d:0xffa726}));
   m.position.copy(from);scene.add(m);
   shots.push({kind:mort?"arc":arch?"dart":frost?"bolt":"shell",m,target:best,src:from.clone(),t:0,dur:arch?.35:mort?.9:frost?.4:.5,dmg:cur.dmg*SM,tw:tw.type,cur,twr:tw});
   if(arch&&tw.lv==4){let b2=null,k2=1e9;for(const e of enemies){if(e===best||e.dead||e.delay>0)continue;const d=e.m.position.distanceTo(tw.m.position);if(d>cur.range*perk.range*(mod&&mod.range||1)*(bliz>0?.75:1))continue;if(-e.dist<k2){k2=-e.dist;b2=e}}
-    if(b2){const m2=new THREE.Mesh(geo,new THREE.MeshBasicMaterial({color:0xfde68a}));m2.position.copy(from);scene.add(m2);shots.push({kind:"dart",m:m2,target:b2,src:from.clone(),t:0,dur:.35,dmg:cur.dmg*SM,tw:tw.type,cur,twr:tw})}}
+    if(b2){let m2;if(A.m2_arrow){m2=inst("m2_arrow",{h:.75});m2.userData.arrow=1}else m2=new THREE.Mesh(geo,new THREE.MeshBasicMaterial({color:0xfde68a}));m2.position.copy(from);scene.add(m2);shots.push({kind:"dart",m:m2,target:b2,src:from.clone(),t:0,dur:.35,dmg:cur.dmg*SM,tw:tw.type,cur,twr:tw})}}
   burst(from,frost?0x7dd3fc:arch?0xd9f99d:0xffb347,3,2);
   sfx(arch?"arrow":mort?"boom":"shoot",.6);
 }
@@ -1031,6 +1032,7 @@ function updateShots(dt){
     const pos=s.src.clone().lerp(tp,t0);
     if(s.kind=="arc"||s.kind=="shell")pos.y+=Math.sin(t0*Math.PI)*(s.kind=="arc"?3.2:1.2);
     s.m.position.copy(pos);
+    if(s.m.userData.arrow){const dv=tp.clone().sub(pos);if(dv.lengthSq()>1e-4){s.m.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),dv.normalize())}}
     if(parts.length<140&&Math.random()<.45)burst(pos,s.kind=="bolt"?0x7dd3fc:s.kind=="dart"?0xd9f99d:0xffcf80,1,0);
     if(s.t>=1){
       s.done=true;scene.remove(s.m);
