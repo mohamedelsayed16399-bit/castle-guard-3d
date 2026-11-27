@@ -127,6 +127,9 @@ canvas{display:block;position:fixed;inset:0;touch-action:none}
 <div class="ov" id="perk"><h1>🎁 اختار ميزة</h1><p>الميزة دي لحد آخر المرحلة</p><div id="perkb" style="display:flex;flex-direction:column;gap:10px"></div><p id="perkl"></p></div>
 <div class="ov" id="pause"><h1>⏸ وقفة</h1><div class="opt"><button class="btn xs" id="autob">⏭ موجة أوتو: مقفول</button><button class="btn xs" id="musb">🎵 موسيقى</button><button class="btn xs" id="qualb">🎨 جودة: عالية</button></div><div id="runst" style="font-size:14px;color:#a5f3fc;margin:6px 0;text-align:center"></div><div id="tip" style="max-width:340px;font-size:13px;color:#fde68a;margin:4px 0;text-align:center"></div><div id="legend" style="display:flex;flex-wrap:wrap;gap:4px;justify-content:center;max-width:360px;max-height:150px;overflow:auto;font-size:11px;margin:6px 0"></div><button class="btn" id="resume">كمّل</button><button class="btn sm" id="pmenu">كل المراحل</button></div>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+<script src="m2a.js?v=1"></script>
+<script src="m2b.js?v=1"></script>
+<script src="m2c.js?v=1"></script>
 <script type="module">
 import * as THREE from "three";
 import {GLTFLoader} from "three/addons/loaders/GLTFLoader.js";
@@ -139,6 +142,7 @@ const ASSET_INDEX={"sk_minion": [0, 533680], "sk_rogue": [533680, 502444], "sk_w
 const A={};
 {const L=new GLTFLoader();const parts=await Promise.all([0,1,2,3,4].map(i=>fetch(["12-a0.bin","14-a1.bin","16-a2.bin","18-a3.bin","20-a4.bin"][i]).then(r=>r.arrayBuffer())));const tot=parts.reduce((a,b)=>a+b.byteLength,0);const u8=new Uint8Array(tot);{let o=0;for(const b of parts){u8.set(new Uint8Array(b),o);o+=b.byteLength}}const buf=u8.buffer;const keys=Object.keys(ASSET_INDEX);let done=0;
  await Promise.all(keys.map(k=>new Promise(res=>{const [o,l]=ASSET_INDEX[k];L.parse(buf.slice(o,o+l),"",g=>{A[k]=g;done++;document.getElementById("ltxt").textContent="جاري التحميل "+done+"/"+keys.length;res()},e=>{console.warn("asset fail",k,e);res()})})));
+ await Promise.all(Object.keys(window.__M2||{}).map(k=>new Promise(res=>{try{const bin=atob(window.__M2[k]);const u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);L.parse(u.buffer,"",g=>{A["m2_"+k]=g;res()},e=>{console.warn("m2 fail",k,e);res()})}catch(e){console.warn("m2",k,e);res()}})));
  document.getElementById("load").classList.remove("on");}
 function inst(name,o={}){ // normalized clone: o.h = height, o.w = max horizontal size
   const src=A[name];const g=new THREE.Group();if(!src)return g;
@@ -346,9 +350,10 @@ const TW={
 const TARGET_MODES=["first","strong","close"],TMN={first:"الأقرب للقلعة",strong:"الأقوى",close:"الأقرب للبرج"};
 function towerModel(type,lv){
   const d=TW[type],g=new THREE.Group();
-  const kind=type=="archer"?"towerA":(type=="cannon"||type=="mortar")?"catapult":"towerB";
+  const m2={mine:"m2_mine",venom:"m2_well",frost:"m2_church",laser:"m2_tower_base"};
+  const kind=m2[type]&&A[m2[type]]?m2[type]:type=="archer"?"towerA":(type=="cannon"||type=="mortar")?"catapult":"towerB";
   const hh={archer:2.6,cannon:2.3,frost:3.0,sniper:3.4,tesla:3.1,mortar:2.1,venom:2.7,laser:3.2,mine:2.3}[type]*(1+.07*(lv-1));
-  const m=inst(kind,{h:hh,tint:d.col,tintMix:.38});g.add(m);
+  const m=inst(kind,{h:hh,tint:d.col,tintMix:kind.startsWith("m2_")?.18:.38});g.add(m);
   if(type=="frost"||type=="tesla"){const orb=new THREE.Mesh(new THREE.IcosahedronGeometry(.26+lv*.04,1),new THREE.MeshBasicMaterial({color:type=="frost"?0x9be4ff:0xfff176}));orb.position.y=hh+.3;g.add(orb);g.userData.orb=orb;
     const pl=new THREE.PointLight(d.col,.9,4);pl.position.y=hh+.3;g.add(pl)}
   if(type=="venom"){const fl=new THREE.Mesh(new THREE.SphereGeometry(.28+lv*.03,10,8),new THREE.MeshBasicMaterial({color:0x34d399,transparent:true,opacity:.85}));fl.position.y=hh+.3;g.add(fl);g.userData.orb=fl}
@@ -1299,6 +1304,5 @@ window.__towers=()=>towers.map(t=>({type:t.type,lv:t.lv,c:t.c,r:t.r}));
 </script>
 </body>
 </html>
-
 
 
