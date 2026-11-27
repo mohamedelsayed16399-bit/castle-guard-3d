@@ -131,6 +131,7 @@ canvas{display:block;position:fixed;inset:0;touch-action:none}
 <script src="m2b.js?v=1"></script>
 <script src="m2c.js?v=1"></script>
 <script src="m2d.js?v=1"></script>
+<script src="m2e.js?v=1"></script>
 <script type="module">
 import * as THREE from "three";
 import {GLTFLoader} from "three/addons/loaders/GLTFLoader.js";
@@ -242,6 +243,7 @@ for(let i=0;i<5;i++){const x=(i%2?1:-1)*(COLS*CS/2+.5+Math.random()*1.5),z=-8+i*
   const t=inst(["treeA","treeB"][i%2],{h:2.2});t.position.set(x,-.4,z);scene.add(t)}
 for(let i=0;i<12;i++){const r=inst(i%2?"rockA":"rockB",{h:.7+Math.random()*.6});
   r.position.set((Math.random()-.5)*(COLS*CS+14),-.4,-(ROWS*CS/2+1.5+Math.random()*4));r.rotation.y=Math.random()*6;scene.add(r)}
+if(A.m2_gravestone){const nm=["m2_gravestone","m2_pumpkin_orange","m2_lantern_standing"];for(let i=0;i<14;i++){const side=i%2?1:-1,x=side*(COLS*CS/2+.9+Math.random()*2.2),z=-(ROWS*CS/2)+1.2+i*(ROWS*CS-2)/14;const k=nm[i%3];const p=inst(k,{h:k=="m2_pumpkin_orange"?.55:k=="m2_gravestone"?.9:1.3});p.position.set(x,-.4,z);p.rotation.y=Math.random()*6;scene.add(p)}}
 {const w=inst("windmill",{h:5});w.position.set(-COLS*CS/2-5,-.4,-10);w.rotation.y=.6;scene.add(w);
  const b=inst("smith",{h:3.2});b.position.set(COLS*CS/2+4.5,-.4,6);b.rotation.y=-.9;scene.add(b)}
 // torches along the road with flickering flames
